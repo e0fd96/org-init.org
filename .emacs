@@ -120,7 +120,6 @@
 (global-set-key (kbd "C-! C-t") 'dired-toggle-read-only)
 (global-set-key (kbd "C-! C-k") 'save-buffers-kill-emacs)
 (global-set-key (kbd "C-! C-i") 'org-id-get-create)
-(global-set-key (kbd "C-! C-r") 'my-org-roam-switch-context)
 
 ;; -- BINDINGS, GENERIC
 (global-set-key (kbd "C-c s") 'flyspell-buffer)
@@ -332,23 +331,9 @@
 
 ;; -- ORG ROAM
 (setq org-roam-v2-ack t
-      org-roam-directory (file-truename "~/emacs/org/org-roam-other")
+      org-roam-directory (file-truename "~/emacs/org/org-roam")
       org-roam-completion-everywhere t)
 (org-roam-db-autosync-mode)
-
-;; -- ORG ROAM SWITCHER
-(setq my-org-roam-context-alist
-      '(("org-roam-academic" . "~/emacs/org/org-roam-academic")
-	("org-roam-other" . "~/emacs/org/org-roam-other")))
-
-(defun my-org-roam-switch-context (c)
-  (interactive
-   (list (completing-read "Choose: " my-org-roam-context-alist nil t)))
-  (let* ((new-folder (cdr (assoc c my-org-roam-context-alist))))
-    (message "Setting org-roam folder to '%s'" new-folder)
-    (setq org-roam-directory new-folder)
-    (org-roam-db-sync) )
-  c)
 
 ;; -- ORG ROAM VISUALISER
 (setq org-roam-ui-sync-theme t
