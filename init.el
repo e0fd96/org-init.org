@@ -49,10 +49,10 @@
   (marginalia-mode))
 
 ;; -- ORDERLESS
-(use-package orderless
-  :ensure t
-  :config
-  (setq completion-styles '(orderless)))
+;; (use-package orderless
+;;   :ensure t
+;;   :config
+;;   (setq completion-styles '(orderless)))
 
 ;; -- SYNOSAURUS
 (use-package synosaurus
@@ -257,8 +257,21 @@
                                 (file-relative-name (org-roam-node-file node) org-roam-directory))))
     (error "")))
 
-(setq org-roam-node-display-template "${type:20} ${title:*} ${tags:*}")
+(setq org-roam-node-display-template (concat "${type:15} | "
+					     (propertize "${tags:30}" 'face 'org-tag)" | ${title:*}"))
 
+;; -- FIX FOR VERTICO AND ROAM
+(defun my/org-roam-node-read--to-candidate (node template)
+  "Return a minibuffer completion candidate given NODE.
+  TEMPLATE is the processed template used to format the entry."
+  (let ((candidate-main (org-roam-node--format-entry
+                         template
+                         node
+                         (1- (frame-width)))))
+    (cons (propertize candidate-main 'node node) node)))
+(advice-add 'org-roam-node-read--to-candidate :override #'my/org-roam-node-read--to-candidate)
+
+;; -- ROAM DONT INCLUDE CERTAIN TAGS
 (setq org-roam-db-node-include-function
       (lambda ()
         (not (member "ATTACH" (org-get-tags)))
@@ -584,10 +597,17 @@
  '(custom-safe-themes
    '("53585ce64a33d02c31284cd7c2a624f379d232b27c4c56c6d822eff5d3ba7625" default))
  '(line-spacing 0.3)
+ '(marginalia-align-offset 5)
+ '(marginalia-field-width 100)
+ '(marginalia-mode t)
  '(org-modules
    '(ol-bbdb ol-bibtex ol-docview ol-doi ol-eww ol-gnus org-habit ol-info ol-irc ol-mhe ol-rmail ol-w3m))
  '(package-selected-packages
-   '(rainbow-delimiters magit xclip writegood-mode wrap-region wc-mode vertico use-package synosaurus rainbow-mode palimpsest org-wc org-static-blog org-roam-ui org-roam-bibtex org-ref org-pomodoro org-journal org-contrib orderless olivetti multiple-cursors modus-themes marginalia helm-descbinds helm-bibtex format-all engine-mode elfeed-org deft backup-each-save auctex)))
+   '(rainbow-delimiters magit xclip writegood-mode wrap-region wc-mode vertico use-package synosaurus rainbow-mode palimpsest org-wc org-static-blog org-roam-ui org-roam-bibtex org-ref org-pomodoro org-journal org-contrib orderless olivetti multiple-cursors modus-themes marginalia helm-descbinds helm-bibtex format-all engine-mode elfeed-org deft backup-each-save auctex))
+ '(vertico-buffer-display-action '(display-buffer-at-bottom (window-height . 13)))
+ '(vertico-grid-max-columns 10)
+ '(vertico-mode t)
+ '(vertico-resize 'grow-only))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
