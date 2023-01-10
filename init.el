@@ -22,6 +22,10 @@
 (use-package rainbow-mode
   :ensure t)
 
+;; -- RAINBOW DELIMITERS
+(use-package rainbow-delimiters
+  :ensure t)
+
 ;; -- MAGIT
 (use-package magit
   :ensure t)
@@ -457,28 +461,54 @@
 
 ;; -- ORG AGENDA
 (setq org-agenda-start-on-weekday nil
-      org-agenda-remove-tags t
       org-habit-following-days 1
       org-agenda-window-setup 'only-window
-      org-agenda-custom-commands
-      '(("T" "TODAY'S TASKS" agenda ""
-         ((org-agenda-overriding-header "Today's agenda")
-          (org-agenda-span 'day)
-          )))
-      org-agenda-prefix-format
-      '((agenda . " %i %?-12t% s")
-        (todo . " %i %-12:c")
-        (tags . " %i %-12:c")
-        (search . " %i %-12:c"))
+      org-tags-match-list-sublevels t
       org-agenda-files
       '("~/emacs/org/org-todo/task-index.org"))
+
+;; -- ORG-AGENDA-CUSTOM-COMMANDS
+(setq org-agenda-custom-commands
+      '(("T" "TODAY'S TASKS"
+	 ((todo "WAITING"
+		((org-agenda-overriding-header "PENDING TASKS")
+		 (org-tags-match-list-sublevels t)))
+	  (agenda ""
+		  ((org-agenda-block-separator nil)
+		   (org-agenda-span 1)
+		   (org-deadline-warning-days 0)
+		   (org-agenda-day-face-function (lambda (date) 'org-agenda-date))
+		   (org-agenda-overriding-header "\nTODAY'S TASKS")))
+	  (agenda ""
+		  ((org-agenda-start-on-weekday nil)
+		   (org-agenda-start-day "+1d")
+		   (org-agenda-span 3)
+		   (org-deadline-warning-days 0)
+		   (org-agenda-block-separator nil)
+		   (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+		   (org-agenda-overriding-header "\nNEXT THREE DAYS")))
+	  (agenda ""
+		  ((org-agenda-time-grid nil)
+		   (org-agenda-start-on-weekday nil)
+		   (org-agenda-start-day "+4d")
+		   (org-agenda-span 14)
+		   (org-agenda-show-all-dates nil)
+		   (org-deadline-warning-days 0)
+		   (org-agenda-block-separator nil)
+		   (org-agenda-entry-types '(:deadline))
+		   (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+		   (org-agenda-overriding-header "\nUPCOMING DEADLINES (+14d)")))
+	  (todo "*"
+		((org-agenda-overriding-header "UNSCHEDULED TASKS")
+		 (org-tags-match-list-sublevels t)
+		 (org-agenda-skip-function '(org-agenda-skip-if nil '(timestamp)))))))))
 
 ;; -- ORG TAGS
 (defun my-org-align-tags () (interactive)
        (org-align-tags 0))
 (add-hook 'org-mode-hook
-          (lambda ()
-            (add-hook 'after-save-hook 'my-org-align-tags nil 'make-it-local)))
+	  (lambda ()
+	    (add-hook 'after-save-hook 'my-org-align-tags nil 'make-it-local)))
 
 ;; -- ORG CAPTURE
 (setq org-capture-templates '(("n" "note-at-point" plain (file "") " - (%^{location}) Here it says that %?.")
@@ -511,8 +541,8 @@
       org-latex-toc-command "\\tableofcontents \\addtocontents{toc}{\\protect\\thispagestyle{empty}} \\newpage"
       org-latex-compiler "xelatex"
       org-latex-pdf-process '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-                              "bibtex %b" "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-                              "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+			      "bibtex %b" "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+			      "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
 ;; -- ORG BASIC
 (setq org-directory "~/emacs/org"
@@ -540,9 +570,9 @@
 ;; -- VANILLA BACKUPS
 (setq auto-save-interval 20)
 (add-to-list 'backup-directory-alist
-             (cons "." "~/emacs/backups/vanilla"))
+	     (cons "." "~/emacs/backups/vanilla"))
 (add-to-list 'backup-directory-alist
-             (cons tramp-file-name-regexp nil))
+	     (cons tramp-file-name-regexp nil))
 
 ;; -- ADDED BY EMACS
 (custom-set-variables
@@ -557,7 +587,7 @@
  '(org-modules
    '(ol-bbdb ol-bibtex ol-docview ol-doi ol-eww ol-gnus org-habit ol-info ol-irc ol-mhe ol-rmail ol-w3m))
  '(package-selected-packages
-   '(magit xclip writegood-mode wrap-region wc-mode vertico use-package synosaurus rainbow-mode palimpsest org-wc org-static-blog org-roam-ui org-roam-bibtex org-ref org-pomodoro org-journal org-contrib orderless olivetti multiple-cursors modus-themes marginalia helm-descbinds helm-bibtex format-all engine-mode elfeed-org deft backup-each-save auctex)))
+   '(rainbow-delimiters magit xclip writegood-mode wrap-region wc-mode vertico use-package synosaurus rainbow-mode palimpsest org-wc org-static-blog org-roam-ui org-roam-bibtex org-ref org-pomodoro org-journal org-contrib orderless olivetti multiple-cursors modus-themes marginalia helm-descbinds helm-bibtex format-all engine-mode elfeed-org deft backup-each-save auctex)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
