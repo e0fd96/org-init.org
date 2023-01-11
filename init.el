@@ -102,6 +102,12 @@
 (use-package helm-bibtex
   :ensure t)
 
+;; -- MOVE-TEXT
+(use-package move-text
+  :ensure t
+  :config
+  (move-text-default-bindings))
+
 ;; -- ENGINE
 (use-package engine-mode
   :ensure t
@@ -354,6 +360,46 @@
 (add-hook 'elfeed-show-mode-hook 'olivetti-mode)
 (add-hook 'elfeed-show-mode-hook 'visual-line-mode)
 
+;; -- GOD MODE
+(use-package god-mode
+  :ensure t
+  :config
+  (god-mode))
+
+;; -- CURSOR CHANGE FOR GOD
+(defun my-god-mode-update-cursor-type ()
+  (setq cursor-type (if (or god-local-mode buffer-read-only) 'box 'bar)))
+(add-hook 'post-command-hook #'my-god-mode-update-cursor-type)
+
+(defun my-god-mode-toggle-on-overwrite ()
+  "Toggle god-mode on overwrite-mode."
+  (if (bound-and-true-p overwrite-mode)
+      (god-local-mode-pause)
+    (god-local-mode-resume)))
+
+(add-hook 'overwrite-mode-hook #'my-god-mode-toggle-on-overwrite)
+
+(require 'god-mode-isearch)
+(define-key isearch-mode-map (kbd "<escape>") #'god-mode-isearch-activate)
+(define-key god-mode-isearch-map (kbd "<escape>") #'god-mode-isearch-disable)
+
+(define-key god-local-mode-map (kbd ".") #'repeat)
+(define-key god-local-mode-map (kbd "i") #'god-local-mode)
+
+(global-set-key (kbd "C-x C-1") #'delete-other-windows)
+(global-set-key (kbd "C-x C-2") #'split-window-below)
+(global-set-key (kbd "C-x C-3") #'split-window-right)
+(global-set-key (kbd "C-x C-0") #'delete-window)
+
+(define-key god-local-mode-map (kbd "[") #'backward-paragraph)
+(define-key god-local-mode-map (kbd "]") #'forward-paragraph)
+
+(use-package key-chord
+  :ensure t)
+(require 'key-chord)
+(key-chord-define-global "jj" #'god-local-mode)
+(key-chord-mode 1)
+
 ;; -- GNU EMACS SETTINGS
 (setq inhibit-startup-screen t
       frame-background-mode 'light
@@ -430,6 +476,7 @@
 (global-set-key (kbd "C-c m") 'overwrite-mode)
 (global-set-key (kbd "<f5>" ) 'async-shell-command)
 (global-set-key (kbd "C-c z") 'olivetti-mode)
+(global-set-key (kbd "<escape>") #'god-local-mode)
 
 ;; -- BINDINGS, MULTIPLE CURSORS
 (global-set-key (kbd "C-M-j") 'mc/mark-all-dwim)
@@ -477,6 +524,11 @@
       org-habit-following-days 1
       org-agenda-window-setup 'only-window
       org-tags-match-list-sublevels t
+      org-agenda-prefix-format
+      '((agenda . " %i %?-12t% s")
+        (todo . " %i %-12:c")
+        (tags . " %i %-12:c")
+        (search . " %i %-12:c"))
       org-agenda-files
       '("~/emacs/org/org-todo/task-index.org"))
 
@@ -597,17 +649,11 @@
  '(custom-safe-themes
    '("53585ce64a33d02c31284cd7c2a624f379d232b27c4c56c6d822eff5d3ba7625" default))
  '(line-spacing 0.3)
- '(marginalia-align-offset 5)
- '(marginalia-field-width 100)
  '(marginalia-mode t)
  '(org-modules
    '(ol-bbdb ol-bibtex ol-docview ol-doi ol-eww ol-gnus org-habit ol-info ol-irc ol-mhe ol-rmail ol-w3m))
  '(package-selected-packages
-   '(rainbow-delimiters magit xclip writegood-mode wrap-region wc-mode vertico use-package synosaurus rainbow-mode palimpsest org-wc org-static-blog org-roam-ui org-roam-bibtex org-ref org-pomodoro org-journal org-contrib orderless olivetti multiple-cursors modus-themes marginalia helm-descbinds helm-bibtex format-all engine-mode elfeed-org deft backup-each-save auctex))
- '(vertico-buffer-display-action '(display-buffer-at-bottom (window-height . 13)))
- '(vertico-grid-max-columns 10)
- '(vertico-mode t)
- '(vertico-resize 'grow-only))
+   '(move-text key-chord god-mode rainbow-delimiters magit xclip writegood-mode wrap-region wc-mode vertico use-package synosaurus rainbow-mode palimpsest org-wc org-static-blog org-roam-ui org-roam-bibtex org-ref org-pomodoro org-journal org-contrib orderless olivetti multiple-cursors modus-themes marginalia helm-descbinds helm-bibtex format-all engine-mode elfeed-org deft backup-each-save auctex)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
