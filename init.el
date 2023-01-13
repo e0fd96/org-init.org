@@ -10,6 +10,10 @@
   (package-install 'use-package))
 (require 'use-package)
 
+;; -- ADD PATHS
+(add-to-list 'exec-path "/home/ilmari/bin/")
+(add-to-list 'exec-path "/home/ilmari/.local/bin/")
+
 ;; -- BACKUP-EACH-SAVE
 (use-package backup-each-save
   :ensure t
@@ -49,10 +53,19 @@
   (marginalia-mode))
 
 ;; -- ORDERLESS
-;; (use-package orderless
-;;   :ensure t
-;;   :config
-;;   (setq completion-styles '(orderless)))
+(use-package orderless
+  :ensure t
+  :config
+  (setq completion-styles '(orderless)))
+
+;; -- CTRL LOCK
+(add-to-list 'load-path "~/emacs/config/.emacs.d/my-elisp/")
+(require 'control-lock)
+(control-lock-keys)
+
+;; -- LUA
+(use-package lua-mode
+  :ensure t)
 
 ;; -- SYNOSAURUS
 (use-package synosaurus
@@ -222,7 +235,16 @@
   (setq org-roam-v2-ack t
 	org-roam-directory (file-truename "~/emacs/org/org-roam")
 	org-roam-completion-everywhere t)
-  (org-roam-db-autosync-mode))
+  (org-roam-db-autosync-mode)
+  (add-hook 'org-roam-buffer-postrender-functions 'visual-line-mode)
+  (add-hook 'org-roam-buffer-postrender-functions 'org-indent-mode)
+  (add-hook 'org-roam-buffer-postrender-functions 'wrap-region-mode)
+  (add-to-list 'display-buffer-alist
+               '("\\*org-roam\\*"
+                 (display-buffer-in-direction)
+                 (direction . right)
+                 (window-width . 0.5)
+                 (window-height . fit-window-to-buffer))))
 
 ;; -- ORG ROAM VISUALISER
 (use-package org-roam-ui
@@ -244,15 +266,16 @@
 	("i" "index" plain "%?" :target (file+head "index/%<%Y-%m-%d>-index-${slug}.org" "#+title: ${title}\n#+filetags: %^{TAGS}") :unnarrowed t)))
 
 ;; -- ORG ROAM FLEETING
-(setq org-roam-dailies-directory "~/emacs/org/org-roam-academic/fleeting-notes"
+(setq org-roam-dailies-directory "~/emacs/org/org-roam/fleeting-notes"
       org-roam-dailies-capture-templates '(("f" "fleeting-notes" entry "\n* %<%Y-%m-%d %H:%M> - %?" :target (file "fleeting-notes.org"))))
 
 ;; -- ORG ROAM BIBTEX
 (use-package org-roam-bibtex
   :ensure t
+  :after org-roam
   :config
-  (setq orb-insert-follow-link t)
-  :hook (after-init-hook . org-roam-bibtex-mode))
+  (setq orb-insert-follow-link t))
+
 
 ;; -- ORG ROAM TWEAKS
 (cl-defmethod org-roam-node-type ((node org-roam-node))
@@ -360,46 +383,6 @@
 (add-hook 'elfeed-show-mode-hook 'olivetti-mode)
 (add-hook 'elfeed-show-mode-hook 'visual-line-mode)
 
-;; -- GOD MODE
-(use-package god-mode
-  :ensure t
-  :config
-  (god-mode))
-
-;; -- CURSOR CHANGE FOR GOD
-(defun my-god-mode-update-cursor-type ()
-  (setq cursor-type (if (or god-local-mode buffer-read-only) 'box 'bar)))
-(add-hook 'post-command-hook #'my-god-mode-update-cursor-type)
-
-(defun my-god-mode-toggle-on-overwrite ()
-  "Toggle god-mode on overwrite-mode."
-  (if (bound-and-true-p overwrite-mode)
-      (god-local-mode-pause)
-    (god-local-mode-resume)))
-
-(add-hook 'overwrite-mode-hook #'my-god-mode-toggle-on-overwrite)
-
-(require 'god-mode-isearch)
-(define-key isearch-mode-map (kbd "<escape>") #'god-mode-isearch-activate)
-(define-key god-mode-isearch-map (kbd "<escape>") #'god-mode-isearch-disable)
-
-(define-key god-local-mode-map (kbd ".") #'repeat)
-(define-key god-local-mode-map (kbd "i") #'god-local-mode)
-
-(global-set-key (kbd "C-x C-1") #'delete-other-windows)
-(global-set-key (kbd "C-x C-2") #'split-window-below)
-(global-set-key (kbd "C-x C-3") #'split-window-right)
-(global-set-key (kbd "C-x C-0") #'delete-window)
-
-(define-key god-local-mode-map (kbd "[") #'backward-paragraph)
-(define-key god-local-mode-map (kbd "]") #'forward-paragraph)
-
-(use-package key-chord
-  :ensure t)
-(require 'key-chord)
-(key-chord-define-global "jj" #'god-local-mode)
-(key-chord-mode 1)
-
 ;; -- GNU EMACS SETTINGS
 (setq inhibit-startup-screen t
       frame-background-mode 'light
@@ -449,10 +432,11 @@
 (add-hook 'prog-mode-hook 'format-all-mode)
 (add-hook 'prog-mode-hook 'abbrev-mode)
 (add-hook 'format-all-mode-hook 'format-all-ensure-formatter)
+(add-hook 'prog-mode-hook 'rainbow-mode)
+(add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
 
 ;; -- PYTHON
-(setq format-all-show-errors 'never
-      python-indent-guess-indent-offset nil
+(setq python-indent-guess-indent-offset nil
       python-indent-guess-indent-offset-verbose nil)
 
 ;; -- BINDINGS, DANGEROUS
@@ -524,11 +508,6 @@
       org-habit-following-days 1
       org-agenda-window-setup 'only-window
       org-tags-match-list-sublevels t
-      org-agenda-prefix-format
-      '((agenda . " %i %?-12t% s")
-        (todo . " %i %-12:c")
-        (tags . " %i %-12:c")
-        (search . " %i %-12:c"))
       org-agenda-files
       '("~/emacs/org/org-todo/task-index.org"))
 
@@ -615,6 +594,7 @@
       org-log-into-drawer t
       org-clock-into-drawer "CLOCK"
       org-startup-truncated t
+      org-startup-indented t
       org-tags-column 0
       org-archive-location "~/emacs/org/org-archive/org-archive-global.org::* From %s"
       org-archive-mark-done t
@@ -648,12 +628,13 @@
  '(custom-enabled-themes '(modus-operandi))
  '(custom-safe-themes
    '("53585ce64a33d02c31284cd7c2a624f379d232b27c4c56c6d822eff5d3ba7625" default))
+ '(format-all-show-errors 'never)
  '(line-spacing 0.3)
  '(marginalia-mode t)
  '(org-modules
    '(ol-bbdb ol-bibtex ol-docview ol-doi ol-eww ol-gnus org-habit ol-info ol-irc ol-mhe ol-rmail ol-w3m))
  '(package-selected-packages
-   '(move-text key-chord god-mode rainbow-delimiters magit xclip writegood-mode wrap-region wc-mode vertico use-package synosaurus rainbow-mode palimpsest org-wc org-static-blog org-roam-ui org-roam-bibtex org-ref org-pomodoro org-journal org-contrib orderless olivetti multiple-cursors modus-themes marginalia helm-descbinds helm-bibtex format-all engine-mode elfeed-org deft backup-each-save auctex)))
+   '(markdown-mode lua-mode move-text key-chord god-mode rainbow-delimiters magit xclip writegood-mode wrap-region wc-mode vertico use-package synosaurus rainbow-mode palimpsest org-wc org-static-blog org-roam-ui org-roam-bibtex org-ref org-pomodoro org-journal org-contrib orderless olivetti multiple-cursors modus-themes marginalia helm-descbinds helm-bibtex format-all engine-mode elfeed-org deft backup-each-save auctex)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
