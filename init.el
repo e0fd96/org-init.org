@@ -1,20 +1,29 @@
+;;--------------------------------------------------;;
 ;; -- PACKAGE
+;;--------------------------------------------------;;
 (require 'package)
 (add-to-list 'package-archives '("melpa"  . "https://melpa.org/packages/")     t)
 (add-to-list 'package-archives '("elp"    . "https://elpa.gnu.org/packages/")  t)
 (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t)
 (package-initialize)
 
+;;--------------------------------------------------;;
 ;; -- ENSURE "USE-PACKAGE" INSTALLED
+;;--------------------------------------------------;;
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 (require 'use-package)
 
+;;--------------------------------------------------;;
 ;; -- ADD PATHS
+;;--------------------------------------------------;;
 (add-to-list 'exec-path "/home/ilmari/bin/")
 (add-to-list 'exec-path "/home/ilmari/.local/bin/")
+(add-to-list 'load-path "~/emacs/config/.emacs.d/my-elisp/")
 
+;;--------------------------------------------------;;
 ;; -- BACKUP-EACH-SAVE
+;;--------------------------------------------------;;
 (use-package backup-each-save
   :ensure t
   :init
@@ -22,59 +31,105 @@
 	backup-each-save-remote-files nil)
   :hook (after-save-hook . backup-each-save))
 
-;; -- RAINBOW MODE (colors hex values)
+;;--------------------------------------------------;;
+;; -- RAINBOW MODE
+;;--------------------------------------------------;;
 (use-package rainbow-mode
   :ensure t)
 
+;;--------------------------------------------------;;
 ;; -- RAINBOW DELIMITERS
+;;--------------------------------------------------;;
 (use-package rainbow-delimiters
   :ensure t)
 
+;;--------------------------------------------------;;
 ;; -- MAGIT
+;;--------------------------------------------------;;
 (use-package magit
   :ensure t)
 
+;;--------------------------------------------------;;
 ;; -- XCLIP (needs X)
+;;--------------------------------------------------;;
 (use-package xclip
   :ensure t
   :config
   (xclip-mode 1))
 
+;;--------------------------------------------------;;
 ;; -- VERTICO
+;;--------------------------------------------------;;
 (use-package vertico
   :ensure t
   :init
   (vertico-mode))
 
+;;--------------------------------------------------;;
 ;; -- MARGINALIA
+;;--------------------------------------------------;;
 (use-package marginalia
   :ensure t
   :config
   (marginalia-mode))
 
+;;--------------------------------------------------;;
 ;; -- ORDERLESS
+;;--------------------------------------------------;;
 (use-package orderless
   :ensure t
   :config
   (setq completion-styles '(orderless)))
 
+;;--------------------------------------------------;;
 ;; -- CTRL LOCK
-(add-to-list 'load-path "~/emacs/config/.emacs.d/my-elisp/")
+;;--------------------------------------------------;;
 (require 'control-lock)
 (control-lock-keys)
 
+;;--------------------------------------------------;;
+;; -- SENTENCE WORD COUNT
+;;--------------------------------------------------;;
+(defun my-sentence-counter ()
+  "count sentence words"
+  (interactive)
+  (forward-char)
+  (backward-sentence)
+  (set-mark-command nil)
+  (forward-sentence)
+  (message "There are *%s* words in this sentence."
+	   (count-words-region
+	    (region-beginning)
+	    (region-end))))
+
+;;--------------------------------------------------;;
+;; -- KEY CHORD
+;;--------------------------------------------------;;
+(use-package key-chord
+  :ensure t
+  :config
+  (setq key-chord-two-keys-delay 0.5)
+  (key-chord-define-global "jj" 'my-sentence-counter)
+  (key-chord-mode 1))
+
+;;--------------------------------------------------;;
 ;; -- LUA
+;;--------------------------------------------------;;
 (use-package lua-mode
   :ensure t)
 
+;;--------------------------------------------------;;
 ;; -- SYNOSAURUS
+;;--------------------------------------------------;;
 (use-package synosaurus
   :ensure t
   :config
   (setq synosaurus-choose-method 'popup
 	synosaurus-backend 'synosaurus-backend-wordnet))
 
+;;--------------------------------------------------;;
 ;; -- ISPELL
+;;--------------------------------------------------;;
 (use-package ispell
   :ensure t
   :config
@@ -82,13 +137,17 @@
 	ispell-silently-savep t
 	ispell-dictionary "en_GB"))
 
+;;--------------------------------------------------;;
 ;; -- ABBREV-MODE
+;;--------------------------------------------------;;
 (use-package abbrev
   :config
   (setq abbrev-file-name "~/emacs/abbrev_defs/abbrev_defs"
 	save-abbrevs 'silently))
 
+;;--------------------------------------------------;;
 ;; -- WRITEGOOD
+;;--------------------------------------------------;;
 (use-package writegood-mode
   :ensure t
   :config
@@ -103,25 +162,35 @@
 	  "outside the box" "In this regard" "With this in mind"
 	  "With the above in mind" "In this sense" "variety")))
 
+;;--------------------------------------------------;;
 ;; -- HELM DESCBINDS
+;;--------------------------------------------------;;
 (use-package helm-descbinds
   :ensure t)
 
+;;--------------------------------------------------;;
 ;; -- MULTIPLES CURSORS
+;;--------------------------------------------------;;
 (use-package multiple-cursors
   :ensure t)
 
+;;--------------------------------------------------;;
 ;; -- HELM BIBTEX
+;;--------------------------------------------------;;
 (use-package helm-bibtex
   :ensure t)
 
+;;--------------------------------------------------;;
 ;; -- MOVE-TEXT
+;;--------------------------------------------------;;
 (use-package move-text
   :ensure t
   :config
   (move-text-default-bindings))
 
+;;--------------------------------------------------;;
 ;; -- ENGINE
+;;--------------------------------------------------;;
 (use-package engine-mode
   :ensure t
   :config
@@ -137,7 +206,9 @@
   (defengine dita-1.3.-elements "https://www.oxygenxml.com/dita/1.3/specs/search.html?searchQuery=%s"
 	     :keybinding "d"))
 
+;;--------------------------------------------------;;
 ;; -- ORG JOURNAL
+;;--------------------------------------------------;;
 (use-package org-journal
   :ensure t
   :config
@@ -154,7 +225,9 @@
     (org-narrow-to-subtree))
   (goto-char (point-max)))
 
+;;--------------------------------------------------;;
 ;; -- ORG EXTRAS
+;;--------------------------------------------------;;
 (use-package org-contrib
   :ensure t
   :config
@@ -164,7 +237,9 @@
   (ox-extras-activate
    '(ignore-headlines)))
 
+;;--------------------------------------------------;;
 ;; -- ORG REF
+;;--------------------------------------------------;;
 (use-package org-ref
   :ensure t
   :config
@@ -186,7 +261,9 @@
   (require 'org-ref)
   (require 'org-ref-helm))
 
+;;--------------------------------------------------;;
 ;; -- ORG WEBSITE
+;;--------------------------------------------------;;
 (use-package org-static-blog
   :ensure t
   :config
@@ -195,6 +272,7 @@
 	org-static-blog-publish-directory "~/emacs/org/org-blog/html"
 	org-static-blog-posts-directory "~/emacs/org/org-roam/blog"
 	org-static-blog-drafts-directory "~/emacs/org/org-blog/blog-drafts"
+	org-static-blog-preview-date-first-p t
 	org-static-blog-enable-tags nil
 	org-static-blog-preview-ellipsis ""
 	org-static-blog-use-preview t
@@ -202,7 +280,7 @@
 	org-static-blog-preview-end "")
 
   (setq org-static-blog-index-front-matter "<div id=\"recent-posts\">
-                                          <h2>recent posts</h2>
+                                          <h2>Recent posts</h2>
                                           </div>")
 
   (setq org-static-blog-page-header "<meta name=\"author\" content=\"e0fd96\">
@@ -219,16 +297,20 @@
                                      </div></div>")
 
   (setq org-static-blog-page-postamble "<div id=\"bottom-nav\">
-                                      <a href=\"https://e0fd96.xyz/rss.xml\">RSS</a> | <a href=\"https://creativecommons.org/licenses/by-nc/4.0/\">License</a> | <a href=\"https://www.debian.org/\">Debian hosted</a>
+                                      <a href=\"https://e0fd96.xyz/rss.xml\">RSS</a> <a href=\"https://creativecommons.org/licenses/by-nc/4.0/\">License</a></a>
                                       </div>"))
 
+;;--------------------------------------------------;;
 ;; -- ORG WC
+;;--------------------------------------------------;;
 (use-package org-wc
   :ensure t
   :config
   (setq org-wc-ignored-tags '("ARCHIVE")))
 
+;;--------------------------------------------------;;
 ;; -- ORG ROAM
+;;--------------------------------------------------;;
 (use-package org-roam
   :ensure t
   :config
@@ -240,13 +322,15 @@
   (add-hook 'org-roam-buffer-postrender-functions 'org-indent-mode)
   (add-hook 'org-roam-buffer-postrender-functions 'wrap-region-mode)
   (add-to-list 'display-buffer-alist
-               '("\\*org-roam\\*"
+	       '("\\*org-roam\\*"
                  (display-buffer-in-direction)
                  (direction . right)
                  (window-width . 0.5)
                  (window-height . fit-window-to-buffer))))
 
+;;--------------------------------------------------;;
 ;; -- ORG ROAM VISUALISER
+;;--------------------------------------------------;;
 (use-package org-roam-ui
   :ensure t
   :config
@@ -255,7 +339,9 @@
 	org-roam-ui-update-on-save t
 	org-roam-ui-open-on-start t))
 
+;;--------------------------------------------------;;
 ;; -- ORG ROAM CAPTURE
+;;--------------------------------------------------;;
 (setq org-roam-capture-templates
       '(("p" "permanent" plain "%?" :target (file+head "permanent-notes/%<%Y-%m-%d>-permanent-${slug}.org" "#+title: ${title}\n#+filetags: %^{TAGS}\n\n - [ ] One subject, signified by the title.\n - [ ] Wording that is independent of any other topic.\n - [ ] Between 100-200 words.\n\n--\n + ") :unnarrowed t)
 	("b" "blog-draft" plain "%?" :target (file+head "blog-drafts/%<%Y-%m-%d>-blog-draft.org" "#+title: ${title}\n#+filetags: %^{TAGS}\n#+DESCRIPTION: %^{short description}\n#+date: <%<%Y-%m-%d %H:%M>>\n* Introduction\n* par2\n* par3\n* par4\n* par5\n* par6\n* par7\n* Conclusion\n* References :ignore:\n#+BIBLIOGRAPHY: bibliography.bib plain option:-a option:-noabstract option:-heveaurl limit:t\n* Footnotes :ignore:\n* Text-dump :noexport:") :unnarrowed t)
@@ -265,31 +351,39 @@
         ("w" "work" plain "%?" :target (file+head "work/%<%Y-%m-%d>-work-${slug}.org" "#+title: ${title}\n#+filetags: %^{TAGS}\n") :unnarrowed t)
 	("i" "index" plain "%?" :target (file+head "index/%<%Y-%m-%d>-index-${slug}.org" "#+title: ${title}\n#+filetags: %^{TAGS}") :unnarrowed t)))
 
+;;--------------------------------------------------;;
 ;; -- ORG ROAM FLEETING
+;;--------------------------------------------------;;
 (setq org-roam-dailies-directory "~/emacs/org/org-roam/fleeting-notes"
       org-roam-dailies-capture-templates '(("f" "fleeting-notes" entry "\n* %<%Y-%m-%d %H:%M> - %?" :target (file "fleeting-notes.org"))))
 
+;;--------------------------------------------------;;
 ;; -- ORG ROAM BIBTEX
+;;--------------------------------------------------;;
 (use-package org-roam-bibtex
   :ensure t
   :after org-roam
   :config
-  (setq orb-insert-follow-link t))
+  (setq orb-insert-follow-link t)
+  (add-hook 'after-init-hook 'org-roam-bibtex-mode))
 
-
+;;--------------------------------------------------;;
 ;; -- ORG ROAM TWEAKS
+;;--------------------------------------------------;;
 (cl-defmethod org-roam-node-type ((node org-roam-node))
   "Return the TYPE of NODE."
   (condition-case nil
       (file-name-nondirectory (directory-file-name
-                               (file-name-directory
+			       (file-name-directory
                                 (file-relative-name (org-roam-node-file node) org-roam-directory))))
     (error "")))
 
 (setq org-roam-node-display-template (concat "${type:15} | "
 					     (propertize "${tags:30}" 'face 'org-tag)" | ${title:*}"))
 
+;;--------------------------------------------------;;
 ;; -- FIX FOR VERTICO AND ROAM
+;;--------------------------------------------------;;
 (defun my/org-roam-node-read--to-candidate (node template)
   "Return a minibuffer completion candidate given NODE.
   TEMPLATE is the processed template used to format the entry."
@@ -300,13 +394,17 @@
     (cons (propertize candidate-main 'node node) node)))
 (advice-add 'org-roam-node-read--to-candidate :override #'my/org-roam-node-read--to-candidate)
 
-;; -- ROAM DONT INCLUDE CERTAIN TAGS
+;;--------------------------------------------------;;
+;; -- ORG ROAM DONT INCLUDE CERTAIN TAGS
+;;--------------------------------------------------;;
 (setq org-roam-db-node-include-function
       (lambda ()
         (not (member "ATTACH" (org-get-tags)))
         ))
 
+;;--------------------------------------------------;;
 ;; -- ORG POMODORO
+;;--------------------------------------------------;;
 (use-package org-pomodoro
   :ensure t
   :config
@@ -315,29 +413,48 @@
 	org-pomodoro-long-break-frequency 5
 	org-pomodoro-long-break-length 10))
 
+;;--------------------------------------------------;;
 ;; -- PALIMPSEST
+;;--------------------------------------------------;;
 (use-package palimpsest
   :ensure t)
 
+;;--------------------------------------------------;;
 ;; -- WRAP-REGION
+;;--------------------------------------------------;;
 (use-package wrap-region
-  :ensure t)
+  :ensure t
+  :config
+  (wrap-region-add-wrappers
+   '(("/" "/")
+     ("*" "*")
+     ("=" "=")
+     ("+" "+")
+     ("_" "_"))))
 
+;;--------------------------------------------------;;
 ;; -- FLYSPELL
+;;--------------------------------------------------;;
 (use-package flyspell
   :ensure t)
 
+;;--------------------------------------------------;;
 ;; -- OLIVETTI
+;;--------------------------------------------------;;
 (use-package olivetti
   :ensure t
   :config
   (setq olivetti-recall-visual-line-mode-entry-state t))
 
+;;--------------------------------------------------;;
 ;; -- WORD COUNT MODE
+;;--------------------------------------------------;;
 (use-package wc-mode
   :ensure t)
 
+;;--------------------------------------------------;;
 ;; -- DEFT
+;;--------------------------------------------------;;
 (use-package deft
   :ensure t
   :config
@@ -346,15 +463,21 @@
 	deft-default-extension "org"
 	deft-directory "~/emacs/org/"))
 
+;;--------------------------------------------------;;
 ;; -- FORMAT ALL
+;;--------------------------------------------------;;
 (use-package format-all
   :ensure t)
 
+;;--------------------------------------------------;;
 ;; -- THEME
+;;--------------------------------------------------;;
 (use-package modus-themes
   :ensure t)
 
+;;--------------------------------------------------;;
 ;; -- ELFEED
+;;--------------------------------------------------;;
 (use-package elfeed
   :ensure t
   :config
@@ -383,9 +506,36 @@
 (add-hook 'elfeed-show-mode-hook 'olivetti-mode)
 (add-hook 'elfeed-show-mode-hook 'visual-line-mode)
 
+;;--------------------------------------------------;;
+;; -- LaTeX
+;;--------------------------------------------------;;
+(setq TeX-auto-save t
+      TeX-parse-self t
+      TeX-PDF-mode t
+      reftex-plug-into-AUCTeX t
+      TeX-engine 'xetex
+      pdf-latex-command "xelatex")
+
+(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+(add-hook 'LaTeX-mode-hook 'format-all-mode)
+(add-hook 'LaTeX-mode-hook 'rainbow-mode)
+(add-hook 'LaTeX-mode-hook 'rainbow-delimiters-mode)
+(add-hook 'LaTeX-mode-hook 'display-line-numbers-mode)
+(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+(add-hook 'LaTeX-mode-hook 'hl-line-mode)
+(add-hook 'LaTeX-mode-hook (lambda () (olivetti-mode -1)))
+
+(use-package latex-preview-pane
+  :ensure t
+  :config
+  (latex-preview-pane-enable))
+
+;;--------------------------------------------------;;
 ;; -- GNU EMACS SETTINGS
+;;--------------------------------------------------;;
 (setq inhibit-startup-screen t
       frame-background-mode 'light
+      sentence-end-double-space nil
       system-time-locale "C"
       tramp-verbose 1
       auth-sources '("~/.authinfo.gpg" "~/.authinfo" "~/.netrc")
@@ -401,11 +551,15 @@
       kill-ring-max 9999
       delete-by-moving-to-trash t)
 
+;;--------------------------------------------------;;
 ;; -- DIRED
+;;--------------------------------------------------;;
 (setq dired-listing-switches "-alh")
 (put 'dired-find-alternate-file 'disabled nil)
 
+;;--------------------------------------------------;;
 ;; -- MODES
+;;--------------------------------------------------;;
 (electric-pair-mode 1)
 (menu-bar-mode -1)
 (show-paren-mode 1)
@@ -416,16 +570,22 @@
 (global-hl-line-mode 1)
 (scroll-bar-mode -1)
 
+;;--------------------------------------------------;;
 ;; -- SCROLLING
+;;--------------------------------------------------;;
 (setq scroll-conservatively 100
       scroll-margin 20)
 
+;;--------------------------------------------------;;
 ;; -- WRITING MISC
+;;--------------------------------------------------;;
 (setq next-line-add-newlines t
       word-wrap-by-category t
       electric-pair-preserve-balance nil)
 
+;;--------------------------------------------------;;
 ;; -- PROGRAMMING HOOKS
+;;--------------------------------------------------;;
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 (add-hook 'prog-mode-hook 'electric-indent-mode)
 (add-hook 'text-mode-hook 'wrap-region-mode)
@@ -435,16 +595,22 @@
 (add-hook 'prog-mode-hook 'rainbow-mode)
 (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
 
+;;--------------------------------------------------;;
 ;; -- PYTHON
+;;--------------------------------------------------;;
 (setq python-indent-guess-indent-offset nil
       python-indent-guess-indent-offset-verbose nil)
 
+;;--------------------------------------------------;;
 ;; -- BINDINGS, DANGEROUS
+;;--------------------------------------------------;;
 (global-set-key (kbd "C-! C-t") 'dired-toggle-read-only)
 (global-set-key (kbd "C-! C-k") 'save-buffers-kill-emacs)
 (global-set-key (kbd "C-! C-i") 'org-id-get-create)
 
+;;--------------------------------------------------;;
 ;; -- BINDINGS, GENERIC
+;;--------------------------------------------------;;
 (global-set-key (kbd "C-c s") 'flyspell-buffer)
 (global-set-key (kbd "C-c w") 'count-words-region)
 (global-set-key (kbd "C-c v") 'visual-line-mode)
@@ -460,9 +626,10 @@
 (global-set-key (kbd "C-c m") 'overwrite-mode)
 (global-set-key (kbd "<f5>" ) 'async-shell-command)
 (global-set-key (kbd "C-c z") 'olivetti-mode)
-(global-set-key (kbd "<escape>") #'god-local-mode)
 
+;;--------------------------------------------------;;
 ;; -- BINDINGS, MULTIPLE CURSORS
+;;--------------------------------------------------;;
 (global-set-key (kbd "C-M-j") 'mc/mark-all-dwim)
 (global-set-key (kbd "C-M-c") 'mc/edit-lines)
 (global-set-key (kbd "C-M-l") 'er/expand-region)
@@ -476,7 +643,9 @@
 (global-set-key (kbd "C-'") 'mc/hide-unmatched-lines-mode)
 (global-set-key (kbd "C-j") 'electric-newline-and-maybe-indent)
 
+;;--------------------------------------------------;;
 ;; -- BINDINGS, ORG
+;;--------------------------------------------------;;
 (global-set-key (kbd "C-c b") 'org-capture-at-point)
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c p") 'org-pomodoro)
@@ -491,7 +660,9 @@
 (global-set-key (kbd "C-c i") 'org-store-link)
 (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
 
+;;--------------------------------------------------;;
 ;; -- BINDINGS, ROAM
+;;--------------------------------------------------;;
 (global-set-key (kbd "C-c n l") 'org-roam-buffer-toggle)
 (global-set-key (kbd "C-c n f") 'org-roam-node-find)
 (global-set-key (kbd "C-c n g") 'org-roam-graph)
@@ -503,7 +674,9 @@
 (global-set-key (kbd "C-c n p") 'completion-at-point)
 (global-set-key (kbd "C-c n s") 'deft)
 
+;;--------------------------------------------------;;
 ;; -- ORG AGENDA
+;;--------------------------------------------------;;
 (setq org-agenda-start-on-weekday nil
       org-habit-following-days 1
       org-agenda-window-setup 'only-window
@@ -511,7 +684,9 @@
       org-agenda-files
       '("~/emacs/org/org-todo/task-index.org"))
 
+;;--------------------------------------------------;;
 ;; -- ORG-AGENDA-CUSTOM-COMMANDS
+;;--------------------------------------------------;;
 (setq org-agenda-custom-commands
       '(("T" "TODAY'S TASKS"
 	 ((todo "WAITING"
@@ -547,14 +722,18 @@
 		 (org-tags-match-list-sublevels t)
 		 (org-agenda-skip-function '(org-agenda-skip-if nil '(timestamp)))))))))
 
+;;--------------------------------------------------;;
 ;; -- ORG TAGS
+;;--------------------------------------------------;;
 (defun my-org-align-tags () (interactive)
        (org-align-tags 0))
 (add-hook 'org-mode-hook
 	  (lambda ()
 	    (add-hook 'after-save-hook 'my-org-align-tags nil 'make-it-local)))
 
+;;--------------------------------------------------;;
 ;; -- ORG CAPTURE
+;;--------------------------------------------------;;
 (setq org-capture-templates '(("n" "note-at-point" plain (file "") " - (%^{location}) Here it says that %?.")
 			      ("w" "weekly-review-at-point" plain (file "~/emacs/org/notes.org") (file "~/emacs/org/org-templates/weekly-review.txt"))
 			      ("d" "diary-at-point" plain (file "~/emacs/org/notes.org") (file "~/emacs/org/org-templates/daily-diary.txt"))
@@ -564,11 +743,15 @@
 			      ("r" "rss todo" entry (file+olp "~/emacs/org/org-todo/task-index.org" "TASK-INDEX") "* TODO %^{Description} %^g:RSS:\nSCHEDULED: %^t\n\n %a\n\n %i")
 			      ("j" "work log entry" plain (function org-journal-find-location) (file "~/emacs/org/org-templates/work-log-prompts") :jump-to-captured t :immediate-finish t)))
 
+;;--------------------------------------------------;;
 ;; -- ORG CAPTURE AT POINT
+;;--------------------------------------------------;;
 (defun org-capture-at-point () (interactive)
        (org-capture 0))
 
+;;--------------------------------------------------;;
 ;; -- ORG EXPORT
+;;--------------------------------------------------;;
 (setq org-export-with-smart-quotes t
       org-latex-tables-centered nil
       org-export-preserve-breaks t
@@ -588,7 +771,9 @@
 			      "bibtex %b" "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
 			      "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
+;;--------------------------------------------------;;
 ;; -- ORG BASIC
+;;--------------------------------------------------;;
 (setq org-directory "~/emacs/org"
       org-startup-folded t
       org-log-into-drawer t
@@ -601,7 +786,9 @@
       org-archive-subtree-save-file-p t
       org-habit-following-days 1)
 
+;;--------------------------------------------------;;
 ;; -- ORG MODE HOOKS
+;;--------------------------------------------------;;
 (add-hook 'org-mode-hook 'olivetti-mode)
 (add-hook 'org-mode-hook 'visual-line-mode)
 (add-hook 'org-mode-hook 'writegood-mode)
@@ -612,14 +799,18 @@
 (add-hook 'org-mode-hook 'flyspell-mode)
 (add-hook 'org-mode-hook 'abbrev-mode)
 
+;;--------------------------------------------------;;
 ;; -- VANILLA BACKUPS
+;;--------------------------------------------------;;
 (setq auto-save-interval 20)
 (add-to-list 'backup-directory-alist
 	     (cons "." "~/emacs/backups/vanilla"))
 (add-to-list 'backup-directory-alist
 	     (cons tramp-file-name-regexp nil))
 
-;; -- ADDED BY EMACS
+;;--------------------------------------------------;;
+;; -- ADDED BY GNU Emacs
+;;--------------------------------------------------;;
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -634,7 +825,7 @@
  '(org-modules
    '(ol-bbdb ol-bibtex ol-docview ol-doi ol-eww ol-gnus org-habit ol-info ol-irc ol-mhe ol-rmail ol-w3m))
  '(package-selected-packages
-   '(markdown-mode lua-mode move-text key-chord god-mode rainbow-delimiters magit xclip writegood-mode wrap-region wc-mode vertico use-package synosaurus rainbow-mode palimpsest org-wc org-static-blog org-roam-ui org-roam-bibtex org-ref org-pomodoro org-journal org-contrib orderless olivetti multiple-cursors modus-themes marginalia helm-descbinds helm-bibtex format-all engine-mode elfeed-org deft backup-each-save auctex)))
+   '(org-static-blog latex-preview-pane pcre2el flyspell-popup markdown-mode lua-mode move-text key-chord rainbow-delimiters magit xclip writegood-mode wrap-region wc-mode vertico use-package synosaurus rainbow-mode palimpsest org-wc org-roam-ui org-roam-bibtex org-ref org-pomodoro org-journal org-contrib orderless olivetti multiple-cursors modus-themes marginalia helm-descbinds helm-bibtex format-all engine-mode elfeed-org deft backup-each-save auctex)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
