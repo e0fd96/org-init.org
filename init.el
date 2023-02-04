@@ -300,11 +300,13 @@
                                    <link rel=\"icon\" href=\"data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏞</text></svg>\">")
 
   (setq org-static-blog-page-preamble "<div id=\"top-nav\">
-                                     <div id=\"website-title\"><a href=\"https://e0fd96.xyz\">e0fd96</a></div>
-                                     <div id=\"top-links\">
-                                     <div id=\"left-link\"><a href=\"https://e0fd96.xyz/archive.html\">Posts</a></div>
-                                     <div id=\"right-link\"><a href=\"https://e0fd96.xyz/contact.html\">Contact</a></div>
-                                     </div></div>")
+                                     	<div id=\"website-title\"><a href=\"https://e0fd96.xyz\">e0fd96</a></div>
+                                     	<div id=\"top-links\">
+                                     		<a href=\"https://e0fd96.xyz/archive.html\">Posts</a> |
+                                        	<a href=\"https://e0fd96.xyz/contact.html\">Contact</a> |
+                                        	<a href=\"https://e0fd96.xyz/podcast.html\">Podcast Editing</a>
+                                     	</div>
+                                       </div>")
 
   (setq org-static-blog-page-postamble "<div id=\"bottom-nav\">
                                       <a href=\"https://e0fd96.xyz/rss.xml\">RSS</a> <a href=\"https://creativecommons.org/licenses/by-nc/4.0/\">License</a></a>
@@ -356,7 +358,7 @@
       '(("p" "permanent" plain "%?" :target (file+head "permanent-notes/%<%Y-%m-%d>-permanent-${slug}.org" "#+title: ${title}\n#+filetags: %^{TAGS}\n\n - [ ] One subject, signified by the title.\n - [ ] Wording that is independent of any other topic.\n - [ ] Between 100-200 words.\n\n--\n + ") :unnarrowed t)
 	("b" "blog-draft" plain "%?" :target (file+head "blog-drafts/%<%Y-%m-%d>-blog-draft.org" "#+title: ${title}\n#+filetags: %^{TAGS}\n#+DESCRIPTION: %^{short description}\n#+date: <%<%Y-%m-%d %H:%M>>\n* Introduction\n* par2\n* par3\n* par4\n* par5\n* par6\n* par7\n* Conclusion\n* References :ignore:\n#+BIBLIOGRAPHY: bibliography.bib plain option:-a option:-noabstract option:-heveaurl limit:t\n* Footnotes :ignore:\n* Text-dump :noexport:") :unnarrowed t)
 	("r" "reference" plain "%?" :target (file+head "reference-notes/%<%Y-%m-%d>-reference-${citekey}.org" "#+title: ${citekey} - ${title}\n#+filetags: %^{TAGS}\n\n--\n + ") :unnarrowed t)
-	("a" "application" plain "%?" :target (file+head "applications/%<%Y-%m-%d>-application-${slug}.org" "#+title: ${title}\n#+filetags: %^{TAGS}\n#+setupfile: ~/emacs/org/org-roam/cv/cover-letter-setup\n#+latex_header: \\fancyhead[R]{Application: ${title}}\n#+export_file_name: /home/ilmari/Downloads/koria-application-letter-2023.pdf\n#+export_title: Ilmari Koria - Application Letter 2023") :unnarrowed t)
+	("a" "application" plain "%?" :target (file+head "applications/%<%Y-%m-%d>-application-${slug}.org" "#+title: ${title}\n#+filetags: %^{TAGS}\n#+setupfile: ~/emacs/org/org-setup/cv-master\n#+export_file_name: /home/ilmari/Downloads/koria-application-${slug}.pdf\n#+export_title: Otto Ilmari Koria - Application: ${title} - 2023") :unnarrowed t)
 	("m" "misc" plain "%?" :target (file+head "misc/%<%Y-%m-%d>-misc-${slug}.org" "#+title: ${title}\n#+filetags: %^{TAGS}\n") :unnarrowed t)
         ("w" "work" plain "%?" :target (file+head "work/%<%Y-%m-%d>-work-${slug}.org" "#+title: ${title}\n#+filetags: %^{TAGS}\n") :unnarrowed t)
 	("i" "index" plain "%?" :target (file+head "index/%<%Y-%m-%d>-index-${slug}.org" "#+title: ${title}\n#+filetags: %^{TAGS}") :unnarrowed t)))
