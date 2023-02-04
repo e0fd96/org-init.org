@@ -185,6 +185,12 @@
   :ensure t)
 
 ;;--------------------------------------------------;;
+;; -- EXPAND REGION
+;;--------------------------------------------------;;
+(use-package expand-region
+  :ensure t)
+
+;;--------------------------------------------------;;
 ;; -- HELM BIBTEX
 ;;--------------------------------------------------;;
 (use-package helm-bibtex
@@ -540,6 +546,7 @@
 (add-hook 'LaTeX-mode-hook 'display-line-numbers-mode)
 (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
 (add-hook 'LaTeX-mode-hook 'hl-line-mode)
+(add-hook 'LaTeX-mode-hook 'multiple-cursors-mode)
 (add-hook 'LaTeX-mode-hook (lambda () (olivetti-mode -1)))
 
 (use-package latex-preview-pane
@@ -612,12 +619,26 @@
 ;;--------------------------------------------------;;
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 (add-hook 'prog-mode-hook 'electric-indent-mode)
-(add-hook 'text-mode-hook 'wrap-region-mode)
+(add-hook 'prog-mode-hook 'wrap-region-mode)
 (add-hook 'prog-mode-hook 'format-all-mode)
 (add-hook 'prog-mode-hook 'abbrev-mode)
 (add-hook 'format-all-mode-hook 'format-all-ensure-formatter)
 (add-hook 'prog-mode-hook 'rainbow-mode)
 (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
+(add-hook 'prog-mode-hook 'multiple-cursors-mode)
+
+;;--------------------------------------------------;;
+;; -- HTML HOOKS
+;;--------------------------------------------------;;
+(add-hook 'html-mode-hook 'display-line-numbers-mode)
+(add-hook 'html-mode-hook 'electric-indent-mode)
+(add-hook 'html-mode-hook 'wrap-region-mode)
+(add-hook 'html-mode-hook 'format-all-mode)
+(add-hook 'html-mode-hook 'abbrev-mode)
+(add-hook 'format-all-mode-hook 'format-all-ensure-formatter)
+(add-hook 'html-mode-hook 'rainbow-mode)
+(add-hook 'html-mode-hook 'rainbow-delimiters-mode)
+(add-hook 'html-mode-hook 'multiple-cursors-mode)
 
 ;;--------------------------------------------------;;
 ;; -- PYTHON
@@ -666,7 +687,7 @@
 (global-set-key (kbd "C-M-s") 'just-one-space)
 (global-set-key (kbd "C-M-y") 'mc/insert-numbers) ;; (C-u-1-0) -- also (rectangle-number-lines)
 (global-set-key (kbd "C-'") 'mc/hide-unmatched-lines-mode)
-(global-set-key (kbd "C-j") 'electric-newline-and-maybe-indent)
+(global-set-key (kbd "C-M-n") 'electric-newline-and-maybe-indent)
 
 ;;--------------------------------------------------;;
 ;; -- BINDINGS, ORG
@@ -861,7 +882,7 @@
  '(org-modules
    '(ol-bbdb ol-bibtex ol-docview ol-doi ol-eww ol-gnus org-habit ol-info ol-irc ol-mhe ol-rmail ol-w3m))
  '(package-selected-packages
-   '(@ pdf-tools org-static-blog latex-preview-pane pcre2el flyspell-popup markdown-mode lua-mode move-text key-chord rainbow-delimiters magit xclip writegood-mode wrap-region wc-mode vertico use-package synosaurus rainbow-mode palimpsest org-wc org-roam-ui org-roam-bibtex org-ref org-pomodoro org-journal org-contrib orderless olivetti multiple-cursors modus-themes marginalia helm-descbinds helm-bibtex format-all engine-mode elfeed-org deft backup-each-save auctex)))
+   '(expand-region @ pdf-tools org-static-blog latex-preview-pane pcre2el flyspell-popup markdown-mode lua-mode move-text key-chord rainbow-delimiters magit xclip writegood-mode wrap-region wc-mode vertico use-package synosaurus rainbow-mode palimpsest org-wc org-roam-ui org-roam-bibtex org-ref org-pomodoro org-journal org-contrib orderless olivetti multiple-cursors modus-themes marginalia helm-descbinds helm-bibtex format-all engine-mode elfeed-org deft backup-each-save auctex)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
