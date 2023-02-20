@@ -228,9 +228,9 @@
 (use-package org-journal
   :ensure t
   :config
-  (setq org-journal-dir "~/emacs/org/org-roam/journal/"
+  (setq org-journal-dir "~/emacs/org/org-journal/"
 	org-journal-date-format "%Y-%m-%d"
-	org-journal-file-format "%m-%Y-journal.org"
+	org-journal-file-format "%Y-%m-journal.org"
 	org-journal-enable-agenda-integration t
 	org-journal-file-type 'monthly
 	org-journal-file-header "#+title: %b %Y Journal\n#+filetags: log todo diary"))
@@ -286,7 +286,7 @@
   (setq org-static-blog-publish-title "e0fd96"
 	org-static-blog-publish-url "https://e0fd96.xyz"
 	org-static-blog-publish-directory "~/emacs/org/org-blog/html"
-	org-static-blog-posts-directory "~/emacs/org/org-roam/blog"
+	org-static-blog-posts-directory "~/emacs/org/org-roam-research/blog"
 	org-static-blog-drafts-directory "~/emacs/org/org-blog/blog-drafts"
 	org-static-blog-preview-date-first-p t
 	org-static-blog-enable-tags nil
@@ -296,8 +296,8 @@
 	org-static-blog-preview-end "")
 
   (setq org-static-blog-index-front-matter "<div id=\"recent-posts\">
-                                          <h2>Recent posts</h2>
-                                          </div>")
+                                            <h2>Recent posts</h2>
+                                            </div>")
 
   (setq org-static-blog-page-header "<meta name=\"author\" content=\"e0fd96\">
                                    <meta name=\"referrer\" content=\"no-referrer\">
@@ -318,6 +318,8 @@
                                       <a href=\"https://e0fd96.xyz/rss.xml\">RSS</a> <a href=\"https://creativecommons.org/licenses/by-nc/4.0/\">License</a></a>
                                       </div>"))
 
+
+
 ;;--------------------------------------------------;;
 ;; -- ORG WC
 ;;--------------------------------------------------;;
@@ -333,7 +335,7 @@
   :ensure t
   :config
   (setq org-roam-v2-ack t
-	org-roam-directory (file-truename "~/emacs/org/org-roam")
+	org-roam-directory (file-truename "~/emacs/org/org-roam-research")
 	org-roam-completion-everywhere t)
   (org-roam-db-autosync-mode)
   (add-hook 'org-roam-buffer-postrender-functions 'visual-line-mode)
@@ -345,6 +347,22 @@
                  (direction . right)
                  (window-width . 0.5)
                  (window-height . fit-window-to-buffer))))
+
+;;--------------------------------------------------;;
+;; -- ORG ROAM SWITCHER THINGY
+;;--------------------------------------------------;;
+(setq my-org-roam-context-alist
+      '(("research" . "~/emacs/org/org-roam-research")
+	("misc" . "~/emacs/org/org-roam-misc")))
+
+(defun my-org-roam-switch-context (c)
+  (interactive
+   (list (completing-read "Choose: " my-org-roam-context-alist nil t)))
+  (let* ((new-folder (cdr (assoc c my-org-roam-context-alist))))
+    (message "Setting org-roam folder to '%s'" new-folder)
+    (setq org-roam-directory new-folder)
+    (org-roam-db-sync) )
+  c)
 
 ;;--------------------------------------------------;;
 ;; -- ORG ROAM VISUALISER
@@ -362,10 +380,10 @@
 ;;--------------------------------------------------;;
 (setq org-roam-capture-templates
       '(("p" "permanent" plain "%?" :target (file+head "permanent-notes/%<%Y-%m-%d>-permanent-${slug}.org" "#+title: ${title}\n#+filetags: %^{TAGS}\n\n - [ ] One subject, signified by the title.\n - [ ] Wording that is independent of any other topic.\n - [ ] Between 100-200 words.\n\n--\n + ") :unnarrowed t)
-	("b" "blog-draft" plain "%?" :target (file+head "blog-drafts/%<%Y-%m-%d>-blog-draft.org" "#+title: ${title}\n#+filetags: %^{TAGS}\n#+DESCRIPTION: %^{short description}\n#+date: <%<%Y-%m-%d %H:%M>>\n* Introduction\n* par2\n* par3\n* par4\n* par5\n* par6\n* par7\n* Conclusion\n* References :ignore:\n#+BIBLIOGRAPHY: bibliography.bib plain option:-a option:-noabstract option:-heveaurl limit:t\n* Footnotes :ignore:\n* Text-dump :noexport:") :unnarrowed t)
+	("b" "blog-draft" plain "%?" :target (file+head "blog-drafts/%<%Y-%m-%d>-blog-draft-${slug}.org" "#+title: ${title}\n#+filetags: %^{TAGS}\n#+DESCRIPTION: %^{short description}\n#+date: <%<%Y-%m-%d %H:%M>>\n* Introduction\n* par2\n* par3\n* par4\n* par5\n* par6\n* par7\n* Conclusion\n* Timestamp :ignore:\n =This blog post was last updated on {{{time(%b %e\\, %Y)}}}.=\n* References :ignore:\n#+BIBLIOGRAPHY: bibliography.bib plain option:-a option:-noabstract option:-heveaurl limit:t\n* Footnotes :ignore:\n* Text-dump :noexport:") :unnarrowed t)
 	("r" "reference" plain "%?" :target (file+head "reference-notes/%<%Y-%m-%d>-reference-${citekey}.org" "#+title: ${citekey} - ${title}\n#+filetags: %^{TAGS}\n\n--\n + ") :unnarrowed t)
 	("a" "application" plain (file "~/emacs/org/org-setup/application-master")
-	 :if-new (file+head "applications/%<%Y-%m-%d>-application-${slug}.org" "#+title: ${title}\n#+filetags: %^{TAGS}\n#+setupfile: ~/emacs/org/org-setup/cv-master\n#+export_file_name: /home/ilmari/Downloads/koria-application-%<%Y-%m-%d>-${slug}.pdf\n#+export_title: Otto Ilmari Koria - Application: ${title} - %<%b %Y>\n\n\n")
+	 :if-new (file+head "applications/%<%Y-%m-%d>-application-${slug}.org" "#+title: Résumé -- Updated {{{time(%b %e %Y)}}} for the role of ${title}\n#+filetags: %^{TAGS}\n#+author: Otto Ilmari Koria\n#+ODT_STYLES_FILE: ~/emacs/org/org-setup/odt-style.ott\n#+export_file_name: /home/ilmari/Downloads/otto-ilmari-koria-application-%<%Y-%m-%d>-${slug}\n#+export_title: Otto Ilmari Koria - Application: ${title} - %<%b %Y>\n")
 	 :unnarrowed t)
 	("m" "misc" plain "%?" :target (file+head "misc/%<%Y-%m-%d>-misc-${slug}.org" "#+title: ${title}\n#+filetags: %^{TAGS}\n") :unnarrowed t)
         ("w" "work" plain "%?" :target (file+head "work/%<%Y-%m-%d>-work-${slug}.org" "#+title: ${title}\n#+filetags: %^{TAGS}\n") :unnarrowed t)
@@ -374,7 +392,7 @@
 ;;--------------------------------------------------;;
 ;; -- ORG ROAM FLEETING
 ;;--------------------------------------------------;;
-(setq org-roam-dailies-directory "~/emacs/org/org-roam/fleeting-notes"
+(setq org-roam-dailies-directory "~/emacs/org/org-roam-research/fleeting-notes"
       org-roam-dailies-capture-templates '(("f" "fleeting-notes" entry "\n* %<%Y-%m-%d %H:%M> - %?" :target (file "fleeting-notes.org"))))
 
 ;;--------------------------------------------------;;
@@ -521,7 +539,7 @@
   :config
   (require 'elfeed-org)
   (elfeed-org)
-  (setq rmh-elfeed-org-files (list "~/emacs/org/org-roam/rss/rss-feed.org")))
+  (setq rmh-elfeed-org-files (list "~/emacs/org/org-roam-misc/rss/rss-feed.org")))
 
 (add-hook 'elfeed-show-mode-hook 'olivetti-mode)
 (add-hook 'elfeed-show-mode-hook 'visual-line-mode)
@@ -573,7 +591,7 @@
       ring-bell-function 'ignore
       server-client-instructions nil
       scroll-bar-mode nil
-      initial-buffer-choice "~/emacs/org/org-roam/misc/2022-10-10-misc-scratch.org"
+      initial-buffer-choice "~/emacs/org/org-roam-misc/misc/2022-10-10-misc-scratch.org"
       user-full-name "Ilmari Koria"
       user-mail-address "ilmarikoria@posteo.net"
       undo-limit 800000
@@ -782,10 +800,10 @@
 ;;--------------------------------------------------;;
 (add-to-list 'org-latex-classes
              '("newlfm"
-               "\\documentclass{newlfm}"
-               ("\\section{%s}" . "\\section*{%s}")
-               ("\\subsection{%s}" . "\\subsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+	       "\\documentclass{newlfm}"
+	       ("\\section{%s}" . "\\section*{%s}")
+	       ("\\subsection{%s}" . "\\subsection*{%s}")
+	       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 
 ;;--------------------------------------------------;;
 ;; -- ORG CAPTURE
@@ -876,13 +894,15 @@
  '(custom-safe-themes
    '("31c0444ad6f28f6d0d6594add71a8960bf5a29f14f0c1e9e5a080b41f6149277" "53585ce64a33d02c31284cd7c2a624f379d232b27c4c56c6d822eff5d3ba7625" default))
  '(doc-view-resolution 300)
+ '(electric-pair-pairs '((34 . 34) (8216 . 8217) (8220 . 8221) (60 . 62)))
  '(format-all-show-errors 'never)
  '(line-spacing 0.3)
  '(marginalia-mode t)
+ '(org-agenda-files '("/home/ilmari/emacs/org/org-todo/task-index.org"))
  '(org-modules
    '(ol-bbdb ol-bibtex ol-docview ol-doi ol-eww ol-gnus org-habit ol-info ol-irc ol-mhe ol-rmail ol-w3m))
  '(package-selected-packages
-   '(expand-region @ pdf-tools org-static-blog latex-preview-pane pcre2el flyspell-popup markdown-mode lua-mode move-text key-chord rainbow-delimiters magit xclip writegood-mode wrap-region wc-mode vertico use-package synosaurus rainbow-mode palimpsest org-wc org-roam-ui org-roam-bibtex org-ref org-pomodoro org-journal org-contrib orderless olivetti multiple-cursors modus-themes marginalia helm-descbinds helm-bibtex format-all engine-mode elfeed-org deft backup-each-save auctex)))
+   '(org-make-toc expand-region @ pdf-tools org-static-blog latex-preview-pane pcre2el flyspell-popup markdown-mode lua-mode move-text key-chord rainbow-delimiters magit xclip writegood-mode wrap-region wc-mode vertico use-package synosaurus rainbow-mode palimpsest org-wc org-roam-ui org-roam-bibtex org-ref org-pomodoro org-journal org-contrib orderless olivetti multiple-cursors modus-themes marginalia helm-descbinds helm-bibtex format-all engine-mode elfeed-org deft backup-each-save auctex)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
