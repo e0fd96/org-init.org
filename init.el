@@ -5,7 +5,7 @@
 (add-to-list 'package-archives '("melpa"  . "https://melpa.org/packages/")     t)
 (add-to-list 'package-archives '("gnu"    . "https://elpa.gnu.org/packages/")  t)
 (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t)
-
+(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 
 ;;--------------------------------------------------;;
@@ -259,7 +259,7 @@
 (use-package org-ref
   :ensure t
   :config
-  (setq bibtex-completion-bibliography '("~/bibliography/bibliography.bib")
+  (setq bibtex-completion-bibliography '("/home/ilmari/bibliography/bibliography.bib")
 	bibtex-completion-library-path '("~/bibliography/bibtex-pdfs/")
 	bibtex-completion-notes-path "~/bibliography/notes/"
 	bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
@@ -382,8 +382,9 @@
       '(("p" "permanent" plain "%?" :target (file+head "permanent-notes/%<%Y-%m-%d>-permanent-${slug}.org" "#+title: ${title}\n#+filetags: %^{TAGS}\n\n - [ ] One subject, signified by the title.\n - [ ] Wording that is independent of any other topic.\n - [ ] Between 100-200 words.\n\n--\n + ") :unnarrowed t)
 	("b" "blog-draft" plain "%?" :target (file+head "blog-drafts/%<%Y-%m-%d>-blog-draft-${slug}.org" "#+title: ${title}\n#+filetags: %^{TAGS}\n#+DESCRIPTION: %^{short description}\n#+date: <%<%Y-%m-%d %H:%M>>\n* Introduction\n* par2\n* par3\n* par4\n* par5\n* par6\n* par7\n* Conclusion\n* Timestamp :ignore:\n =This blog post was last updated on {{{time(%b %e\\, %Y)}}}.=\n* References :ignore:\n#+BIBLIOGRAPHY: bibliography.bib plain option:-a option:-noabstract option:-heveaurl limit:t\n* Footnotes :ignore:\n* Text-dump :noexport:") :unnarrowed t)
 	("r" "reference" plain "%?" :target (file+head "reference-notes/%<%Y-%m-%d>-reference-${citekey}.org" "#+title: ${citekey} - ${title}\n#+filetags: %^{TAGS}\n\n--\n + ") :unnarrowed t)
+ 	("y" "reference-primary" plain "%?" :target (file+head "reference-notes/%<%Y-%m-%d>-reference-primary-${slug}.org" "#+title: %^{Taisho Number, e.g. T0001} -- %^{Collection Name} -- %^{Name of Text}\n#+filetags: %^{TAGS}\n\n--\n + ") :unnarrowed t)
 	("a" "application" plain (file "~/emacs/org/org-setup/application-master")
-	 :if-new (file+head "applications/%<%Y-%m-%d>-application-${slug}.org" "#+title: Résumé -- Updated {{{time(%b %e %Y)}}} for the role of ${title}\n#+filetags: %^{TAGS}\n#+author: Otto Ilmari Koria\n#+ODT_STYLES_FILE: ~/emacs/org/org-setup/odt-style.ott\n#+export_file_name: /home/ilmari/Downloads/otto-ilmari-koria-application-%<%Y-%m-%d>-${slug}\n#+export_title: Otto Ilmari Koria - Application: ${title} - %<%b %Y>\n")
+	 :if-new (file+head "applications/%<%Y-%m-%d>-application-${slug}.org" "#+title: Résumé -- Updated {{{time(%b %e %Y)}}} for the role of ${title}\n#+filetags: %^{TAGS}\n#+author: Otto Ilmari Koria\n#+setupfile: ~/emacs/org/org-setup/cv-master\n#+export_file_name: /home/ilmari/Downloads/otto-ilmari-koria-application-%<%Y-%m-%d>-${slug}\n#+export_title: Otto Ilmari Koria - Application: ${title} - %<%b %Y>\n")
 	 :unnarrowed t)
 	("m" "misc" plain "%?" :target (file+head "misc/%<%Y-%m-%d>-misc-${slug}.org" "#+title: ${title}\n#+filetags: %^{TAGS}\n") :unnarrowed t)
         ("w" "work" plain "%?" :target (file+head "work/%<%Y-%m-%d>-work-${slug}.org" "#+title: ${title}\n#+filetags: %^{TAGS}\n") :unnarrowed t)
@@ -840,10 +841,9 @@
       org-html-postamble-format
       '(("en" "<p class=\"postamble\" style=\"padding-top:5px;font-size:small;\">Author: %a (%e) | Last modified: %C.</p>"))
       org-latex-toc-command "\\tableofcontents \\addtocontents{toc}{\\protect\\thispagestyle{empty}} \\newpage"
-      org-latex-compiler "xelatex"
-      org-latex-pdf-process '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-			      "bibtex %b" "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-			      "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+					; cant use with "export-file-name" for some reason
+      org-latex-pdf-process '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
+
 
 ;;--------------------------------------------------;;
 ;; -- ORG BASIC
@@ -890,9 +890,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes '(modus-operandi))
+ '(custom-enabled-themes '(modus-vivendi))
  '(custom-safe-themes
-   '("31c0444ad6f28f6d0d6594add71a8960bf5a29f14f0c1e9e5a080b41f6149277" "53585ce64a33d02c31284cd7c2a624f379d232b27c4c56c6d822eff5d3ba7625" default))
+   '("dde643b0efb339c0de5645a2bc2e8b4176976d5298065b8e6ca45bc4ddf188b7" "986cdc701d133f7c6b596f06ab5c847bebdd53eb6bc5992e90446d2ddff2ad9e" "5fdc0f5fea841aff2ef6a75e3af0ce4b84389f42e57a93edc3320ac15337dc10" "76f5d6ce2d1792142231cab87260e526db3f8a542c9aaf36fa8e98ea3a339235" "31c0444ad6f28f6d0d6594add71a8960bf5a29f14f0c1e9e5a080b41f6149277" "53585ce64a33d02c31284cd7c2a624f379d232b27c4c56c6d822eff5d3ba7625" default))
  '(doc-view-resolution 300)
  '(electric-pair-pairs '((34 . 34) (8216 . 8217) (8220 . 8221) (60 . 62)))
  '(format-all-show-errors 'never)
@@ -902,7 +902,7 @@
  '(org-modules
    '(ol-bbdb ol-bibtex ol-docview ol-doi ol-eww ol-gnus org-habit ol-info ol-irc ol-mhe ol-rmail ol-w3m))
  '(package-selected-packages
-   '(org-make-toc expand-region @ pdf-tools org-static-blog latex-preview-pane pcre2el flyspell-popup markdown-mode lua-mode move-text key-chord rainbow-delimiters magit xclip writegood-mode wrap-region wc-mode vertico use-package synosaurus rainbow-mode palimpsest org-wc org-roam-ui org-roam-bibtex org-ref org-pomodoro org-journal org-contrib orderless olivetti multiple-cursors modus-themes marginalia helm-descbinds helm-bibtex format-all engine-mode elfeed-org deft backup-each-save auctex)))
+   '(org-ref org-make-toc expand-region @ pdf-tools org-static-blog latex-preview-pane pcre2el flyspell-popup markdown-mode lua-mode move-text key-chord rainbow-delimiters magit xclip writegood-mode wrap-region wc-mode vertico use-package synosaurus rainbow-mode palimpsest org-wc org-roam-ui org-roam-bibtex org-pomodoro org-journal org-contrib orderless olivetti multiple-cursors modus-themes marginalia helm-descbinds helm-bibtex format-all engine-mode elfeed-org deft backup-each-save auctex)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -912,9 +912,8 @@
  '(default ((t (:family "Noto Sans Mono" :foundry "GOOG" :slant normal :weight normal :height 150 :width normal))))
  '(flyspell-duplicate ((t nil)))
  '(flyspell-incorrect ((t (:underline (:color "Red1" :style wave)))))
- '(hl-line ((t (:extend t :background "white smoke"))))
+ '(hl-line ((t (:extend t :background "gray6"))))
  '(minibuffer-prompt ((t (:inherit modus-themes-prompt))))
- '(org-block ((t (:inherit shadow :extend t :background "snow"))))
  '(org-ellipsis ((t (:foreground "black" :underline nil))))
  '(writegood-duplicates-face ((t (:underline (:color "deep sky blue" :style wave)))))
  '(writegood-passive-voice-face ((t (:underline (:color "magenta" :style wave)))))
