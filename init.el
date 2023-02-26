@@ -5,7 +5,6 @@
 (add-to-list 'package-archives '("melpa"  . "https://melpa.org/packages/")     t)
 (add-to-list 'package-archives '("gnu"    . "https://elpa.gnu.org/packages/")  t)
 (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t)
-(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 
 ;;--------------------------------------------------;;
@@ -253,13 +252,14 @@
   (ox-extras-activate
    '(ignore-headlines)))
 
+
 ;;--------------------------------------------------;;
 ;; -- ORG REF
 ;;--------------------------------------------------;;
 (use-package org-ref
   :ensure t
   :config
-  (setq bibtex-completion-bibliography '("/home/ilmari/bibliography/bibliography.bib")
+  (setq bibtex-completion-bibliography '("~/bibliography/bibliography.bib")
 	bibtex-completion-library-path '("~/bibliography/bibtex-pdfs/")
 	bibtex-completion-notes-path "~/bibliography/notes/"
 	bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
@@ -272,8 +272,7 @@
 	  (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
 	bibtex-completion-pdf-open-function
 	(lambda (fpath)
-	  (call-process "open" nil 0 nil fpath))
-	org-ref-cite-insert-version 2)
+	  (call-process "open" nil 0 nil fpath)))
   (require 'org-ref)
   (require 'org-ref-helm))
 
@@ -579,6 +578,11 @@
   (pdf-tools-install)
   (setq-default pdf-view-display-size 'fit-page))
 
+;;--------------------------------------------------;;
+;; -- LILYPOND
+;;--------------------------------------------------;;
+(require 'ob-lilypond)
+
 
 ;;--------------------------------------------------;;
 ;; -- GNU EMACS SETTINGS
@@ -841,8 +845,14 @@
       org-html-postamble-format
       '(("en" "<p class=\"postamble\" style=\"padding-top:5px;font-size:small;\">Author: %a (%e) | Last modified: %C.</p>"))
       org-latex-toc-command "\\tableofcontents \\addtocontents{toc}{\\protect\\thispagestyle{empty}} \\newpage"
-					; cant use with "export-file-name" for some reason
-      org-latex-pdf-process '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
+
+					; ---- cant use with "export-file-name" for some reason
+      ;; org-latex-pdf-process '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f")
+      org-latex-pdf-process '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+      			      "bibtex %b"
+      			      "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+      			      "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")
+      )
 
 
 ;;--------------------------------------------------;;
@@ -851,6 +861,7 @@
 (setq org-directory "~/emacs/org"
       org-startup-folded t
       org-log-into-drawer t
+      org-src-fontify-natively nil
       org-clock-into-drawer "CLOCK"
       org-startup-truncated t
       org-startup-indented t
@@ -890,19 +901,22 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(cursor-type 'box)
  '(custom-enabled-themes '(modus-vivendi))
  '(custom-safe-themes
-   '("dde643b0efb339c0de5645a2bc2e8b4176976d5298065b8e6ca45bc4ddf188b7" "986cdc701d133f7c6b596f06ab5c847bebdd53eb6bc5992e90446d2ddff2ad9e" "5fdc0f5fea841aff2ef6a75e3af0ce4b84389f42e57a93edc3320ac15337dc10" "76f5d6ce2d1792142231cab87260e526db3f8a542c9aaf36fa8e98ea3a339235" "31c0444ad6f28f6d0d6594add71a8960bf5a29f14f0c1e9e5a080b41f6149277" "53585ce64a33d02c31284cd7c2a624f379d232b27c4c56c6d822eff5d3ba7625" default))
+   '("dde643b0efb339c0de5645a2bc2e8b4176976d5298065b8e6ca45bc4ddf188b7" "8f663b8939be3b54d70a4c963d5d0f1cfd278f447cb4257df6c4571fb8c71bca" default))
  '(doc-view-resolution 300)
  '(electric-pair-pairs '((34 . 34) (8216 . 8217) (8220 . 8221) (60 . 62)))
  '(format-all-show-errors 'never)
  '(line-spacing 0.3)
  '(marginalia-mode t)
  '(org-agenda-files '("/home/ilmari/emacs/org/org-todo/task-index.org"))
+ '(org-habit-completed-glyph 88)
+ '(org-habit-today-glyph 20170)
  '(org-modules
    '(ol-bbdb ol-bibtex ol-docview ol-doi ol-eww ol-gnus org-habit ol-info ol-irc ol-mhe ol-rmail ol-w3m))
  '(package-selected-packages
-   '(org-ref org-make-toc expand-region @ pdf-tools org-static-blog latex-preview-pane pcre2el flyspell-popup markdown-mode lua-mode move-text key-chord rainbow-delimiters magit xclip writegood-mode wrap-region wc-mode vertico use-package synosaurus rainbow-mode palimpsest org-wc org-roam-ui org-roam-bibtex org-pomodoro org-journal org-contrib orderless olivetti multiple-cursors modus-themes marginalia helm-descbinds helm-bibtex format-all engine-mode elfeed-org deft backup-each-save auctex)))
+   '(standard-themes org-ref org-make-toc expand-region @ pdf-tools org-static-blog latex-preview-pane pcre2el flyspell-popup markdown-mode lua-mode move-text key-chord rainbow-delimiters magit xclip writegood-mode wrap-region wc-mode vertico use-package synosaurus rainbow-mode palimpsest org-wc org-roam-ui org-roam-bibtex org-pomodoro org-journal org-contrib orderless olivetti multiple-cursors modus-themes marginalia helm-descbinds helm-bibtex format-all engine-mode elfeed-org deft backup-each-save auctex)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -914,6 +928,9 @@
  '(flyspell-incorrect ((t (:underline (:color "Red1" :style wave)))))
  '(hl-line ((t (:extend t :background "gray6"))))
  '(minibuffer-prompt ((t (:inherit modus-themes-prompt))))
+ '(org-block ((t (:background "gray10"))))
+ '(org-block-begin-line ((t (:underline t))))
+ '(org-block-end-line ((t (:background "black"))))
  '(org-ellipsis ((t (:foreground "black" :underline nil))))
  '(writegood-duplicates-face ((t (:underline (:color "deep sky blue" :style wave)))))
  '(writegood-passive-voice-face ((t (:underline (:color "magenta" :style wave)))))
