@@ -49,6 +49,9 @@
 (global-set-key (kbd "C-c f") 'whitespace-mode)
 (global-set-key (kbd "C-c m") 'overwrite-mode)
 (global-set-key (kbd "<f5>" ) 'async-shell-command)
+(global-set-key (kbd "C-c z" ) 'olivetti-mode)
+(global-set-key (kbd "C-x f" ) 'helm-find-files)
+(global-set-key (kbd "M-x" ) 'helm-M-x)
 #+end_src
 
 * bindings, mc
@@ -233,33 +236,22 @@
   :ensure t)
 #+end_src
 
-* completion stack
-
+* helm
 #+begin_src emacs-lisp
-(use-package vertico
+(use-package helm
   :ensure t
-  :init
-  (vertico-mode))
+  :config (helm-mode 1)
+(setq helm-truncate-lines t))
 
-(use-package savehist
-  :init
-  (savehist-mode))
+(use-package helm-descbinds
+  :ensure t)
 
-(use-package marginalia
-  :ensure t
-  :config
-  (marginalia-mode))
+(use-package helm-describe-modes
+  :ensure t)
+#+end_src
 
-(use-package orderless
-  :ensure t
-  :config
-  (setq completion-styles '(orderless basic)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
-
-(add-to-list 'load-path "~/emacs/config/.emacs.d/my-elisp/")
-(require 'control-lock)
-(control-lock-keys)
+* deft
+#+begin_src emacs-lisp
 
 (use-package deft
   :ensure t
@@ -270,7 +262,12 @@
 	deft-directory "~/emacs/org/"))
 #+end_src
 
-
+* control lock
+#+begin_src emacs-lisp
+(add-to-list 'load-path "~/emacs/config/.emacs.d/my-elisp/")
+(require 'control-lock)
+(control-lock-keys)
+#+end_src
 
 * ispell
 #+begin_src emacs-lisp
@@ -493,7 +490,7 @@
 (add-hook 'org-mode-hook 'abbrev-mode)
 #+end_src
 
-* org-journal
+* org journal
 #+begin_src emacs-lisp
 (use-package org-journal
   :ensure t
@@ -523,10 +520,32 @@
 	org-pomodoro-long-break-length 10))
 #+end_src
 
-* org-ref
+* org ref
 #+begin_src emacs-lisp
-(use-package org-ref
+(use-package helm-bibtex
   :ensure t)
+
+(use-package org-ref
+  :ensure t
+  :config
+  (setq bibtex-completion-bibliography '("~/bibliography/bibliography.bib")
+	bibtex-completion-library-path '("~/bibliography/bibtex-pdfs/")
+	bibtex-completion-notes-path "~/bibliography/notes/"
+	bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
+	bibtex-completion-additional-search-fields '(keywords)
+	bibtex-completion-display-formats
+	'((article       . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${journal:40}")
+	  (inbook        . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} Chapter ${chapter:32}")
+	  (incollection  . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
+	  (inproceedings . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
+	  (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
+	bibtex-completion-pdf-open-function
+	(lambda (fpath)
+	  (call-process "open" nil 0 nil fpath))
+	org-ref-cite-insert-version 2)
+  (require 'org-ref)
+  (require 'org-ref-helm)
+(define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link))
 #+end_src
 * org roam
 #+begin_src emacs-lisp
@@ -560,7 +579,6 @@
       (lambda ()
         (not (member "ATTACH" (org-get-tags)))
         ))
-
 #+end_src
 
 * org roam bibtex
