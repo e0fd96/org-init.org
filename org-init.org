@@ -1,10 +1,12 @@
+# -*- olivetti-mode: nil; -*-
+
 * packages
 #+begin_src emacs-lisp
 (require 'package)
-(add-to-list 'package-archives '("melpa"  . "https://melpa.org/packages/")     t)
-(add-to-list 'package-archives '("gnu"    . "https://elpa.gnu.org/packages/")  t)
-(add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t)
-(package-initialize)
+ (add-to-list 'package-archives '("melpa"  . "https://melpa.org/packages/")     t)
+ (add-to-list 'package-archives '("gnu"    . "https://elpa.gnu.org/packages/")  t)
+ (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t)
+ (package-initialize)
 #+end_src 
 
 * abbrev
@@ -58,6 +60,7 @@
 (global-set-key (kbd "C-c f") 'whitespace-mode)
 (global-set-key (kbd "C-c m") 'overwrite-mode)
 (global-set-key (kbd "<f5>" ) 'async-shell-command)
+(global-set-key (kbd "C-c z" ) 'olivetti-mode)
 #+end_src
 
 * bindings, mc
@@ -107,6 +110,30 @@
 (global-set-key (kbd "C-c n s") 'deft)
 #+end_src
 
+* completion stack
+#+begin_src emacs-lisp
+(use-package vertico
+  :ensure t         
+  :init             
+  (vertico-mode))   
+
+(use-package savehist
+  :init           
+  (savehist-mode))
+
+(use-package marginalia
+  :ensure t            
+  :config              
+  (marginalia-mode))   
+
+(use-package orderless                                                       
+  :ensure t                                                                  
+  :config                                                                    
+  (setq completion-styles '(orderless basic)                                 
+        completion-category-defaults nil                                     
+        completion-category-overrides '((file (styles partial-completion)))))
+
+#+end_src
 * ctrl lock
 #+begin_src emacs-lisp
 (add-to-list 'load-path "~/emacs/config/.emacs.d/my-elisp/")
@@ -152,6 +179,7 @@
 
 (use-package elfeed-org
   :ensure t
+  :after org
   :config
   (require 'elfeed-org)
   (elfeed-org)
@@ -255,30 +283,6 @@
 (add-hook 'html-mode-hook 'multiple-cursors-mode)
 #+end_src
 
-* icomplete
-#+begin_src emacs-lisp
-(use-package icomplete-vertical
-  :ensure t
-  :demand t
-  :custom
-  (completion-styles '(partial-completion substring))
-  (completion-category-overrides '((file (styles basic substring))))
-  (read-file-name-completion-ignore-case t)
-  (read-buffer-completion-ignore-case t)
-  (completion-ignore-case t)
-  :config
-  (icomplete-mode)
-  (icomplete-vertical-mode)
-  :bind (:map icomplete-minibuffer-map
-              ("<down>" . icomplete-forward-completions)
-              ("C-n" . icomplete-forward-completions)
-              ("<up>" . icomplete-backward-completions)
-              ("C-p" . icomplete-backward-completions)
-              ("C-v" . icomplete-vertical-toggle)))
-
-
-#+end_src
-
 * ispell
 #+begin_src emacs-lisp
 (use-package ispell
@@ -367,6 +371,66 @@
 (use-package olivetti
   :ensure t)
 #+end_src
+* org
+#+begin_src emacs-lisp
+(use-package org 
+  :straight (:type built-in))
+; (use-package org :straight nil)
+
+#+end_src
+* org roam
+#+begin_src emacs-lisp
+  (use-package org-roam
+    :ensure t
+    :defer t
+    :config
+    (setq org-roam-v2-ack t
+          org-roam-directory (file-truename "~/emacs/org/org-roam-research")
+          org-roam-completion-everywhere t
+          ; org-roam-database-connector 'sqlite3
+)
+    (org-roam-db-autosync-mode)
+    (add-to-list 'display-buffer-alist
+                 '("\\*org-roam\\*"
+                   (display-buffer-in-direction)
+                   (direction . right)
+                   (window-width . 0.5)
+                   (window-height . fit-window-to-buffer))))
+
+  ;; (cl-defmethod org-roam-node-type ((node org-roam-node))
+  ;;   "Return the TYPE of NODE."
+  ;;   (condition-case nil
+  ;;       (file-name-nondirectory (directory-file-name
+  ;; 			       (file-name-directory
+  ;;                                 (file-relative-name (org-roam-node-file node) org-roam-directory))))
+  ;;     (error "")))
+
+  ;; (setq org-roam-node-display-template (concat "${title:*} | "
+  ;; 					     (propertize "${tags:30}" 'face 'org-tag)" | ${type:15}"))
+
+  ;; (setq org-roam-db-node-include-function
+  ;;       (lambda ()
+  ;;         (not (member "ATTACH" (org-get-tags)))
+  ;;         ))
+
+#+end_src
+
+* org roam switcher
+#+begin_src emacs-lisp
+(setq my-org-roam-context-alist
+      '(("research" . "~/emacs/org/org-roam-research")
+	("misc" . "~/emacs/org/org-roam-misc")))
+
+(defun my-org-roam-switch-context (c)
+  (interactive
+   (list (completing-read "Choose: " my-org-roam-context-alist nil t)))
+  (let* ((new-folder (cdr (assoc c my-org-roam-context-alist))))
+    (message "Setting org-roam folder to '%s'" new-folder)
+    (setq org-roam-directory new-folder)
+    (org-roam-db-sync))
+  c)
+#+end_src
+
 * org agenda
 #+begin_src emacs-lisp
 (setq org-agenda-start-on-weekday nil
@@ -461,14 +525,15 @@
 
 * org extras
 #+begin_src emacs-lisp
-(use-package org-contrib
-  :ensure t
-  :config
-  (require 'ox-extra)
-  (require 'ox-latex)
-  (require 'ox-bibtex)
-  (ox-extras-activate
-   '(ignore-headlines)))
+  ;; (use-package org-contrib
+  ;;   :ensure t
+  ;;   :after org
+  ;;   :config
+  ;;   (require 'ox-extra)
+  ;;   (require 'ox-latex)
+  ;;   (require 'ox-bibtex)
+  ;;   (ox-extras-activate
+  ;;    '(ignore-headlines)))
 #+end_src
 
 * org generic
@@ -479,7 +544,6 @@
         org-src-fontify-natively nil
         org-clock-into-drawer "CLOCK"
         org-startup-truncated t
-      org-use-speed-commands t
         org-startup-indented t
         org-tags-column 0
         org-archive-location "~/emacs/org/org-archive/org-archive-global.org::* From %s"
@@ -488,23 +552,11 @@
         org-habit-following-days 1)
 #+end_src
 
-* org hooks
-#+begin_src emacs-lisp
-(add-hook 'org-mode-hook 'olivetti-mode)
-(add-hook 'org-mode-hook 'visual-line-mode)
-(add-hook 'org-mode-hook 'writegood-mode)
-(add-hook 'org-mode-hook 'wc-mode)
-(add-hook 'org-mode-hook 'synosaurus-mode)
-(add-hook 'org-mode-hook 'palimpsest-mode)
-(add-hook 'org-mode-hook 'wrap-region-mode)
-(add-hook 'org-mode-hook 'flyspell-mode)
-(add-hook 'org-mode-hook 'abbrev-mode)
-#+end_src
-
 * org-journal
 #+begin_src emacs-lisp
 (use-package org-journal
   :ensure t
+  :after org
   :config
   (setq org-journal-dir "~/emacs/org/org-journal/"
 	org-journal-date-format "%Y-%m-%d"
@@ -524,46 +576,13 @@
 #+begin_src emacs-lisp
 (use-package org-pomodoro
   :ensure t
+  :after org
   :config
   (setq org-pomodoro-audio-player "/usr/bin/mpv"
+      
 	org-pomodoro-play-sounds t
 	org-pomodoro-long-break-frequency 5
 	org-pomodoro-long-break-length 10))
-#+end_src
-
-* org roam
-#+begin_src emacs-lisp
-(use-package org-roam
-  :ensure t
-  :config
-  (setq org-roam-v2-ack t
-	org-roam-directory (file-truename "~/emacs/org/org-roam-research")
-	org-roam-completion-everywhere t
-        org-roam-database-connector 'sqlite3)
-  (org-roam-db-autosync-mode)
-  (add-to-list 'display-buffer-alist
-	       '("\\*org-roam\\*"
-                 (display-buffer-in-direction)
-                 (direction . right)
-                 (window-width . 0.5)
-                 (window-height . fit-window-to-buffer))))
-
-(cl-defmethod org-roam-node-type ((node org-roam-node))
-  "Return the TYPE of NODE."
-  (condition-case nil
-      (file-name-nondirectory (directory-file-name
-			       (file-name-directory
-                                (file-relative-name (org-roam-node-file node) org-roam-directory))))
-    (error "")))
-
-(setq org-roam-node-display-template (concat "${type:15} | "
-					     (propertize "${tags:30}" 'face 'org-tag)" | ${title:*}"))
-
-(setq org-roam-db-node-include-function
-      (lambda ()
-        (not (member "ATTACH" (org-get-tags)))
-        ))
-
 #+end_src
 
 * org roam bibtex
@@ -606,26 +625,11 @@
       org-src-tab-acts-natively t)
 #+end_src
 
-* org roam switcher
-#+begin_src emacs-lisp
-(setq my-org-roam-context-alist
-      '(("research" . "~/emacs/org/org-roam-research")
-	("misc" . "~/emacs/org/org-roam-misc")))
-
-(defun my-org-roam-switch-context (c)
-  (interactive
-   (list (completing-read "Choose: " my-org-roam-context-alist nil t)))
-  (let* ((new-folder (cdr (assoc c my-org-roam-context-alist))))
-    (message "Setting org-roam folder to '%s'" new-folder)
-    (setq org-roam-directory new-folder)
-    (org-roam-db-sync) )
-  c)
-#+end_src
-
 * org roam vis
 #+begin_src emacs-lisp
 (use-package org-roam-ui
   :ensure t
+  :after org-roam
   :config
   (setq org-roam-ui-sync-theme t
 	org-roam-ui-follow t
@@ -646,6 +650,7 @@
 #+begin_src emacs-lisp
 (use-package org-wc
   :ensure t
+  :after org
   :config
   (setq org-wc-ignored-tags '("ARCHIVE")))
 #+end_src
@@ -654,6 +659,7 @@
 #+begin_src emacs-lisp
 (use-package org-static-blog
   :ensure t
+  :after org
   :config
   (setq org-static-blog-publish-title "e0fd96"
 	org-static-blog-publish-url "https://e0fd96.xyz"
@@ -689,6 +695,19 @@
   (setq org-static-blog-page-postamble "<div id=\"bottom-nav\">
                                       <a href=\"https://e0fd96.xyz/rss.xml\">RSS</a> <a href=\"https://creativecommons.org/licenses/by-nc/4.0/\">License</a></a>
                                       </div>"))
+#+end_src
+
+* org hooks
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook 'olivetti-mode)
+(add-hook 'org-mode-hook 'visual-line-mode)
+(add-hook 'org-mode-hook 'writegood-mode)
+(add-hook 'org-mode-hook 'wc-mode)
+(add-hook 'org-mode-hook 'synosaurus-mode)
+(add-hook 'org-mode-hook 'palimpsest-mode)
+(add-hook 'org-mode-hook 'wrap-region-mode)
+(add-hook 'org-mode-hook 'flyspell-mode)
+(add-hook 'org-mode-hook 'abbrev-mode)
 #+end_src
 
 * palimpsest
