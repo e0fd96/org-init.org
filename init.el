@@ -4,6 +4,10 @@
 (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t)
 (package-initialize)
 
+(use-package org
+  :ensure org-contrib
+  :demand t)
+
 (use-package abbrev
   :config
   (setq abbrev-file-name "~/emacs/abbrev_defs/abbrev_defs"
@@ -300,6 +304,23 @@
                  (window-width . 0.5)
                  (window-height . fit-window-to-buffer))))
 
+(cl-defmethod org-roam-node-type ((node org-roam-node))
+  "Return the TYPE of NODE."
+  (condition-case nil
+      (file-name-nondirectory (directory-file-name
+			       (file-name-directory
+                                (file-relative-name (org-roam-node-file node) org-roam-directory))))
+    (error "")))
+
+(setq org-roam-node-display-template (concat "${type:15} | "
+					     (propertize "${tags:30}" 'face 'org-tag)" | ${title:*}"))
+
+(setq org-roam-db-node-include-function
+      (lambda ()
+        (not (member "ATTACH" (org-get-tags)))
+        ))
+
+
 (setq my-org-roam-context-alist
       '(("research" . "~/emacs/org/org-roam-research")
 	("misc" . "~/emacs/org/org-roam-misc")))
@@ -312,9 +333,6 @@
     (setq org-roam-directory new-folder)
     (org-roam-db-sync))
   c)
-
-(use-package org
-  :ensure t)
 
 (setq org-agenda-start-on-weekday nil
       org-habit-following-days 1
@@ -610,7 +628,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(sqlite3 writegood-mode wrap-region wc-mode emacsql-sqlite3 vertico use-package rainbow-mode rainbow-delimiters palimpsest org-wc org-static-blog org-roam-ui org-roam-bibtex org-pomodoro org-journal org-contrib orderless olivetti multiple-cursors move-text marginalia magit lua-mode latex-preview-pane format-all expand-region engine-mode elfeed-org deft backup-each-save)))
+   '(org-ref org sqlite3 writegood-mode wrap-region wc-mode emacsql-sqlite3 vertico use-package rainbow-mode rainbow-delimiters palimpsest org-wc org-static-blog org-roam-ui org-roam-bibtex org-pomodoro org-journal org-contrib orderless olivetti multiple-cursors move-text marginalia magit lua-mode latex-preview-pane format-all expand-region engine-mode elfeed-org deft backup-each-save)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
