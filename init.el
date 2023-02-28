@@ -10,6 +10,7 @@
   :demand t)
 
 (org-babel-load-file "~/emacs/config/.emacs.d/org-init.org")
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -17,10 +18,19 @@
  ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
  '(column-number-mode t)
+ '(custom-enabled-themes '(modus-operandi))
+ '(custom-safe-themes
+   '("bfc0b9c3de0382e452a878a1fb4726e1302bf9da20e69d6ec1cd1d5d82f61e3d" default))
+ '(org-file-apps
+   '((auto-mode . emacs)
+     (directory . emacs)
+     ("\\.mm\\'" . default)
+     ("\\.x?html?\\'" . "firefox %s")
+     ("\\.pdf" . "evince %s")))
  '(org-modules
    '(ol-bbdb ol-bibtex ol-docview ol-doi ol-eww ol-gnus org-habit ol-info ol-irc ol-mhe ol-rmail ol-w3m))
  '(package-selected-packages
-   '(helm-descbinds writegood-mode wrap-region wc-mode rainbow-delimiters emacsql-sqlite3 use-package rainbow-mode palimpsest org-wc org-static-blog org-roam-ui org-roam-bibtex org-ref org-pomodoro org-journal org-contrib olivetti multiple-cursors move-text magit lua-mode latex-preview-pane format-all expand-region engine-mode elfeed-org deft backup-each-save))
+   '(org-make-toc key-chord modus-themes helm-descbinds writegood-mode wrap-region wc-mode rainbow-delimiters emacsql-sqlite3 use-package rainbow-mode palimpsest org-wc org-static-blog org-roam-ui org-roam-bibtex org-ref org-pomodoro org-journal org-contrib olivetti multiple-cursors move-text magit lua-mode latex-preview-pane format-all expand-region engine-mode elfeed-org deft backup-each-save))
  '(show-paren-mode t)
  '(tool-bar-mode nil))
 (custom-set-faces

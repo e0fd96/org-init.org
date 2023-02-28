@@ -1,3 +1,72 @@
+* table of contents
+:properties:
+:toc:      :include all :ignore this
+:end:
+:contents:
+- [[#abbrev][abbrev]]
+- [[#backup-each-save][backup each save]]
+- [[#backups][backups]]
+- [[#bindings-dangerous][bindings, dangerous]]
+- [[#bindings-generic][bindings, generic]]
+- [[#bindings-mc][bindings, mc]]
+- [[#bindings-org][bindings, org]]
+- [[#bindings-roam][bindings, roam]]
+- [[#ctrl-lock][ctrl lock]]
+- [[#deft][deft]]
+- [[#dired][dired]]
+- [[#elfeed][elfeed]]
+- [[#emacs-basic][emacs basic]]
+- [[#engine][engine]]
+- [[#expand-region][expand region]]
+- [[#flyspell][flyspell]]
+- [[#format-all][format all]]
+- [[#helm][helm]]
+- [[#deft][deft]]
+- [[#control-lock][control lock]]
+- [[#ispell][ispell]]
+- [[#latex][latex]]
+- [[#lilypond][lilypond]]
+- [[#lua][lua]]
+- [[#magit][magit]]
+- [[#mc][mc]]
+- [[#misc-modes][misc modes]]
+- [[#move-text][move text]]
+- [[#olivetti][olivetti]]
+- [[#org-agenda][org agenda]]
+- [[#org-capture][org capture]]
+- [[#org-capture-at-point][org capture at point]]
+- [[#org-export][org export]]
+- [[#org-extras][org extras]]
+- [[#org-generic][org generic]]
+- [[#org-hooks][org hooks]]
+- [[#org-journal][org journal]]
+- [[#org-pomodoro][org pomodoro]]
+- [[#org-ref][org ref]]
+- [[#org-roam][org roam]]
+- [[#org-roam-bibtex][org roam bibtex]]
+- [[#org-roam-capture][org roam capture]]
+- [[#org-roam-dailies][org roam dailies]]
+- [[#org-src][org src]]
+- [[#org-roam-switcher][org roam switcher]]
+- [[#org-roam-vis][org roam vis]]
+- [[#org-tags][org tags]]
+- [[#org-wc][org wc]]
+- [[#org-website][org website]]
+- [[#palimpsest][palimpsest]]
+- [[#rainbow-mode][rainbow mode]]
+- [[#python][python]]
+- [[#scrolling][scrolling]]
+- [[#sentenc-word-count][sentenc word count]]
+- [[#sqlite3][sqlite3]]
+- [[#wc-mode][wc mode]]
+- [[#wrap-region][wrap region]]
+- [[#writegood][writegood]]
+- [[#writing-misc][writing misc]]
+- [[#html-hooks][html hooks]]
+- [[#prog-hooks][prog hooks]]
+- [[#key-chord][key-chord]]
+:end:
+
 * abbrev
 #+begin_src emacs-lisp
 (use-package abbrev
@@ -87,7 +156,7 @@
 (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
 #+end_src
 
-* bindings roam
+* bindings, roam
 #+begin_src emacs-lisp
 (global-set-key (kbd "C-c n l") 'org-roam-buffer-toggle)
 (global-set-key (kbd "C-c n f") 'org-roam-node-find)
@@ -286,7 +355,7 @@
       TeX-parse-self t
       TeX-PDF-mode t
       reftex-plug-into-AUCTeX t
-      TeX-view-program-selection '((output-pdf "PDF Tools"))
+      TeX-view-program-selection '((output-pdf "xdg-open"))
       TeX-source-correlate-start-server t)
 
 ;; revert pdf-view after compilation
@@ -302,10 +371,10 @@
 (add-hook 'LaTeX-mode-hook 'multiple-cursors-mode)
 (add-hook 'LaTeX-mode-hook (lambda () (olivetti-mode -1)))
 
-(use-package latex-preview-pane
-  :ensure t
-  :config
-  (latex-preview-pane-enable))
+;; (use-package latex-preview-pane
+;;   :ensure t
+;;   :config
+;;   (latex-preview-pane-enable))
 #+end_src
 
 * lilypond
@@ -469,13 +538,20 @@
         org-src-fontify-natively nil
         org-clock-into-drawer "CLOCK"
         org-startup-truncated t
-      org-use-speed-commands t
+        org-use-speed-commands t
         org-startup-indented t
         org-tags-column 0
         org-archive-location "~/emacs/org/org-archive/org-archive-global.org::* From %s"
         org-archive-mark-done t
         org-archive-subtree-save-file-p t
         org-habit-following-days 1)
+
+ (setq org-file-apps
+   '((auto-mode . emacs)
+     (directory . emacs)
+     ("\\.mm\\'" . default)
+     ("\\.x?html?\\'" . "firefox %s")
+     ("\\.pdf" . "evince %s")))
 #+end_src
 
 * org hooks
@@ -573,7 +649,7 @@
     (error "")))
 
 (setq org-roam-node-display-template (concat "${type:15} | "
-					     (propertize "${tags:30}" 'face 'org-tag)" | ${title:*}"))
+					     (propertize "${tags:40}" 'face 'org-tag)" | ${title:*}"))
 
 (setq org-roam-db-node-include-function
       (lambda ()
@@ -697,13 +773,14 @@
                                      	<div id=\"top-links\">
                                      		<a href=\"https://e0fd96.xyz/archive.html\">Posts</a> |
                                         	<a href=\"https://e0fd96.xyz/contact.html\">Contact</a> |
-                                        	<a href=\"https://e0fd96.xyz/podcast.html\">Podcast Editing</a>
+                                        	<a href=\"https://e0fd96.xyz/podcast.html\">Podcast Editing</a> |
+                                              <a href=\"https://e0fd96.xyz/rss.xml\">RSS</a> 
                                      	</div>
-                                       </div>")
+                                      </div>")
 
   (setq org-static-blog-page-postamble "<div id=\"bottom-nav\">
-                                      <a href=\"https://e0fd96.xyz/rss.xml\">RSS</a> <a href=\"https://creativecommons.org/licenses/by-nc/4.0/\">License</a></a>
-                                      </div>"))
+                                        <a href=\"https://creativecommons.org/licenses/by-nc/4.0/\">License</a></a>
+                                        </div>"))
 #+end_src
 
 * palimpsest
@@ -823,5 +900,16 @@
 (add-hook 'prog-mode-hook 'rainbow-mode)
 (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
 (add-hook 'prog-mode-hook 'multiple-cursors-mode)
+#+end_src
+
+
+* key-chord
+#+begin_src emacs-lisp
+(use-package key-chord
+  :ensure t
+  :config
+  (setq key-chord-two-keys-delay 0.5)
+  (key-chord-define-global "jj" 'my-sentence-counter)
+  (key-chord-mode 1))
 #+end_src
 
